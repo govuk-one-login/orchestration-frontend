@@ -7,7 +7,7 @@
 > To build the app
 
 ```shell script
-npm build
+npm run build
 ```
 
 

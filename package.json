@@ -6,7 +6,11 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "mocha --recursive \"src/**/*.test.ts\" --exclude \"src/**/*.integration.test.ts\"",
+    "test:integration": "mocha --recursive \"src/**/*.integration.test.ts\"",
+    "check-pretty": "prettier --check \"*/**/*.{ts,json}\"",
+    "lint": "eslint . --ext .ts,.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +28,12 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.19",
+    "@types/mocha": "^10.0.2",
     "@types/node": "^20.8.4",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "eslint": "^8.51.0",
+    "mocha": "^10.2.0",
+    "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   }
 }
