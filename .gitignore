@@ -3,3 +3,6 @@ dist
 
 # Dependency directories
 node_modules/
+
+# Additional ignores
+.idea
