@@ -13,13 +13,15 @@
     "baseUrl": ".",
     "typeRoots": [
       "@types",
-      "/node_modules/@types"
+      "node_modules/@types"
     ]
   },
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts"
+  ],
   "exclude": [
     "test",
     "coverage",
-    "src/components/**/tests"
+    "src/**/**/tests"
   ]
 }
