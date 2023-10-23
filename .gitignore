@@ -4,8 +4,10 @@ dist
 # Dependency directories
 node_modules/
 
+# dotenv environment variables file
+.env
+
 # Additional ignores
 .idea
-
 
 src/assets/javascript/all.js

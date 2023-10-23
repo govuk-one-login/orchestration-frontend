@@ -1,46 +1,44 @@
-import express, {Express, Request, Response} from "express";
+import express from "express";
 import {pageNotFoundHandler} from "./handlers/page-not-found-handler";
 import {configureNunjucks} from "./config/nunchucks";
 import path from "path";
 import i18next from "i18next";
 import Backend from "i18next-fs-backend";
 import {i18nextConfigurationOptions} from "./config/i18next";
-
 import i18nextMiddleware from "i18next-http-middleware";
-const port = 8000;
+import {getCookieLanguageMiddleware} from "./middleware/cookie-lang-middleware";
 
-const app: Express = express();
 const APP_VIEWS = [
     path.join(__dirname, "components"),
     path.resolve("node_modules/govuk-frontend/"),
 ];
 
-app.use(
-    "/assets",
-    express.static(path.resolve("node_modules/govuk-frontend/govuk/assets"))
-);
+function createApp(): express.Application {
+    const app: express.Application = express();
 
-app.use("/public", express.static(path.join(__dirname, "public")));
-app.set("view engine", configureNunjucks(app, APP_VIEWS));
-
-
-i18next
-    .use(Backend)
-    .use(i18nextMiddleware.LanguageDetector)
-    .init(
-        i18nextConfigurationOptions(
-            path.join(__dirname, "locales/{{lng}}/{{ns}}.json")
-        )
+    app.use(
+        "/assets",
+        express.static(path.resolve("node_modules/govuk-frontend/govuk/assets"))
     );
 
-app.use(i18nextMiddleware.handle(i18next));
+    app.use("/public", express.static(path.join(__dirname, "public")));
+    app.set("view engine", configureNunjucks(app, APP_VIEWS));
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("HELLO FROM EXPRESS + TS!!!!");
-});
+    i18next
+        .use(Backend)
+        .use(i18nextMiddleware.LanguageDetector)
+        .init(
+            i18nextConfigurationOptions(
+                path.join(__dirname, "locales/{{lng}}/{{ns}}.json")
+            )
+        );
 
-app.listen(port, () => {
-    console.log(`now listening on port ${port}`);
-});
+    app.use(i18nextMiddleware.handle(i18next));
+    app.use(getCookieLanguageMiddleware);
 
-app.use(pageNotFoundHandler);
+    app.use(pageNotFoundHandler);
+
+    return app;
+}
+
+export {createApp};
