@@ -1,35 +1,32 @@
-import {expect, sinon} from "../../../test/utils/test-utils";
-import {NextFunction, Request, Response} from "express";
-import {HTTP_STATUS_CODES} from "../../app.constants";
-import {pageNotFoundHandler} from "../page-not-found-handler";
+import { expect, sinon } from "../../../test/utils/test-utils";
+import { NextFunction, Request, Response } from "express";
+import { pageNotFoundHandler } from "../page-not-found-handler";
+import { mockRequest, mockResponse } from "mock-req-res";
 
 describe("serverErrorHandler", () => {
-    let req: Request;
+    let req: Request; 
     let res: Response;
     let next: NextFunction;
 
     beforeEach(() => {
-        req = {} as Request;
-        res = {
-            headersSent: false,
-            statusCode: 200,
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            render: () => {
-            },
-            status: function (newStatus: number) {
-                this.statusCode = newStatus;
-            },
-        } as unknown as Response;
-        next = sinon.spy();
+        req = mockRequest();
+        res = mockResponse();
+        next = sinon.fake() as unknown as NextFunction;
+
+        pageNotFoundHandler(req, res, next);
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it("should render 404 template if page not found", () => {
-        const renderSpy = sinon.spy(res, "render");
         const expectedTemplate = "errors/404.njk";
 
-        pageNotFoundHandler(req, res, next);
+        expect(res.render).to.have.been.calledOnceWith(expectedTemplate);
+    });
 
-        expect(renderSpy).to.have.been.calledOnceWith(expectedTemplate);
-        expect(res.statusCode).to.equal(HTTP_STATUS_CODES.NOT_FOUND);
+    it("should return a 404 status code if page not found", () => {
+        expect(res.status).to.have.been.calledOnceWith(404);
     });
 });

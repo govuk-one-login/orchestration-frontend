@@ -43,6 +43,7 @@
   "devDependencies": {
     "@types/chai-as-promised": "^7.1.7",
     "@types/express": "^4.17.19",
+    "@types/mock-req-res": "^1.1.5",
     "@types/node": "^20.8.4",
     "@types/nunjucks": "^3.2.1",
     "@types/sinon": "^10.0.19",
@@ -50,6 +51,7 @@
     "copyfiles": "^2.4.1",
     "dotenv": "^16.3.1",
     "mocha": "^10.2.0",
+    "mock-req-res": "^1.2.1",
     "sinon-chai": "^3.7.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2",
