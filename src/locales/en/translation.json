@@ -112,6 +112,13 @@
         "govUKHomepageButtonHref": "https://www.gov.uk/",
         "govUKHomepageButtonText": "Go to the GOV.UK homepage"
       }
+    },
+    "error500": {
+      "title": "There’s a problem with this service",
+      "header": "Sorry, there is a problem",
+      "content": {
+        "paragraph1": "Try again later."
+      }
     }
   }
 }
