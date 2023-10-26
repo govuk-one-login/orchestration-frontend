@@ -1,13 +1,17 @@
 # orchestration-frontend
 
-## Useful commands
+## Running the app
+
+### Set the environment variables
+
+Create a copy of the .env.sample file and rename it .env
 
 ### Build
 
 > To build the app
 
 ```shell script
-npm build
+npm run build
 ```
 
 
@@ -16,5 +20,5 @@ npm build
 > To start the app
 
 ```shell script
-npm start
+npm run start
 ```

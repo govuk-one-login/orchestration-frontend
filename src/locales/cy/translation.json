@@ -1,0 +1,117 @@
+{
+  "general": {
+    "provider": "GOV.UK",
+    "pageTitle": "Mewngofnodi i GOV.UK",
+    "serviceNameTitle": "GOV.UK One Login",
+    "errorTitlePrefix": "Gwall",
+    "back": "Yn ôl",
+    "warning": "Rhybudd",
+    "errorSummaryTitle": "Mae problem",
+    "sendMessage": "Anfon neges",
+    "phaseBanner": {
+      "tag": "beta",
+      "message": {
+        "start": "Mae hwn yn wasanaeth newydd – bydd eich ",
+        "linkText": "adborth (agor mewn tab newydd)",
+        "end": " yn ein helpu i’w wella."
+      }
+    },
+    "authenticatorAppIssuer": "GOV.UK One Login",
+    "yes": "Gallwch",
+    "no": "Na",
+    "cookie": {
+      "cookieBanner": {
+        "title": "Cwcis ar GOV.UK One Login",
+        "heading": "Cwcis ar GOV.UK One Login",
+        "paragraph1": "Rydym yn defnyddio rhai cwcis hanfodol i wneud i’r gwasanaeth hwn weithio.",
+        "paragraph2": "Hoffem hefyd ddefnyddio cwcis dadansoddi er mwyn i ni allu deall sut rydych yn defnyddio’r gwasanaeth a gwneud gwelliannau.",
+        "buttonAcceptText": "Derbyn cwcis dadansoddi",
+        "buttonRejectText": "Gwrthod cwcis dadansoddi",
+        "linkViewCookiesText": "Gweld cwcis",
+        "cookieBannerTitleText": "Llwyddiant",
+        "cookieBannerHideLink": "Cuddio’r neges yma",
+        "cookeBannerAccept": {
+          "paragraph1": "Rydych wedi derbyn cwcis ychwanegol. Gallwch ",
+          "paragraph2": " unrhyw bryd."
+        },
+        "cookeBannerReject": {
+          "paragraph1": "Rydych wedi gwrthod cwcis ychwanegol. Gallwch ",
+          "paragraph2": " unrhyw bryd."
+        },
+        "changeCookiePreferencesLink": "newid eich gosodiadau cwcis"
+      },
+      "cookieText": "Mae GOV.UK yn defnyddio cwcis i wneud y safle’n symlach.",
+      "cookieLink": "#",
+      "cookieLinkText": "Darganfyddwch fwy am gwcis"
+    },
+    "continue": {
+      "label": "Parhau"
+    },
+    "contactAccounts": {
+      "contactLinkHref": "https://signin.account.gov.uk/support",
+      "contactLinkText": "Cysylltu â thîm GOV.UK One Login (agor mewn tab newydd)"
+    },
+    "header": {
+      "homepageHref": "https://www.gov.uk/"
+    },
+    "footer": {
+      "accessibilityStatement": {
+        "pageTitle": "Datganiad hygyrchedd",
+        "linkText": "Datganiad hygyrchedd"
+      },
+      "cookies": {
+        "pageTitle": "Polisi Cwcis",
+        "linkText": "Cwcis"
+      },
+      "terms": {
+        "pageTitle": "Telerau ac amodau",
+        "linkText": "Telerau ac amodau"
+      },
+      "privacy": {
+        "pageTitle": "Hysbysiad preifatrwydd",
+        "linkText": "Hysbysiad preifatrwydd"
+      },
+      "support": {
+        "pageTitle": "Cefnogaeth",
+        "linkText": "Cefnogaeth (agor mewn tab newydd)"
+      },
+      "copyright": {
+        "linkText": "© Hawlfraint y goron"
+      },
+      "contentLicence": {
+        "linkText": "Mae’r holl gynnwys ar gael o dan <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence-cymraeg/version/3/\" rel=\"licence\">Trwydded Llywodraeth Agored v3.0</a>, oni nodir yn wahanol"
+      }
+    },
+    "showPassword": {
+      "show": "Dangos",
+      "hide": "Cuddio",
+      "showFullText": "Dangos cyfrinair",
+      "hideFullText": "Cuddio cyfrinair",
+      "announceShown": "Mae eich cyfrinair wedi’i ddangos",
+      "announceHidden": "Mae eich cyfrinair wedi’i guddio"
+    },
+    "showRetypedPassword": {
+      "show": "Dangos",
+      "hide": "Cuddio",
+      "showFullText": "Dangos cyfrinair wedi’i aildeipio",
+      "hideFullText": "Cuddio cyfrinair wedi’i aildeipio",
+      "announceShown": "Mae eich cyfrinair wedi’i aildeipio wedi cael ei ddangos",
+      "announceHidden": "Mae eich cyfrinair wedi’i aildeipio wedi cael ei guddio"
+    }
+  },
+  "error": {
+    "error404": {
+      "title": "Tudalen heb ei darganfod",
+      "header": "Tudalen heb ei darganfod",
+      "content": {
+        "paragraph1": "Ni allwn ddod o hyd i’r dudalen rydych chi’n chwilio amdani.",
+        "whatYouCanDo": "Beth allwch chi ei wneud",
+        "paragraph2": "Os ydych wedi teipio’r cyfeiriad gwe, edrychwch i weld ei fod yn gywir.",
+        "paragraph3": "Os ydych wedi gludo’r cyfeiriad gwe, edrychwch i weld eich bod wedi copïo’r cyfeiriad cyfan.",
+        "paragraph4": "Gallwch hefyd fynd i hafan GOV.UK i ddod o hyd i’r gwasanaeth roeddech yn ceisio ei ddefnyddio, neu edrych amdano drwy ddefnyddio eich peiriant chwilio.",
+        "govUKHomepageButtonHref": "https://www.gov.uk/",
+        "govUKHomepageButtonText": "Ewch i hafan GOV.UK"
+      }
+    }
+  }
+}

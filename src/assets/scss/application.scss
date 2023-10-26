@@ -1,0 +1,142 @@
+@import "base";
+@import "core/all";
+@import "utilities/all";
+@import "objects/all";
+@import "overrides/all";
+
+@import "components/button/button";
+@import "components/cookie-banner/cookie-banner";
+@import "components/details/details";
+@import "components/error-summary/error-summary";
+@import "components/footer/footer";
+@import "components/header/header";
+@import "components/notification-banner/notification-banner";
+@import "components/panel/panel";
+@import "components/phase-banner/phase-banner";
+@import "components/skip-link/skip-link";
+@import "components/summary-list/summary-list";
+
+.interrupt-screen {
+  background-color: #1d70b8;
+  padding: 30px;
+  margin-right: 15px;
+  margin-left: 15px;
+  width: auto;
+}
+
+.govuk-white-text {
+  color: #ffffff;
+}
+
+.govuk-blue-text {
+  color: #1d70b8;
+  font-weight: bold;
+}
+
+.govuk-bold {
+  font-weight: bold;
+}
+
+.govuk-white-button {
+  background-color: #ffffff;
+}
+
+.govuk-white-link {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.govuk-btn-link {
+  vertical-align: inherit;
+  border: none;
+  outline: none;
+  background: none;
+  cursor: pointer;
+  color: #ffffff;
+  box-shadow: 0px 1px #ffffff;
+  padding: 0;
+}
+
+.govuk-btn-as-link {
+  vertical-align: inherit;
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
+  color: $govuk-link-colour;
+  box-shadow: 0px 1px #ffffff;
+  margin:0;
+}
+
+.govuk-btn-as-link:hover{
+  background: none;
+  color: $govuk-link-visited-colour;
+  text-decoration: underline;
+}
+
+.govuk-btn-link:hover {
+  background: none;
+}
+
+.inverted-button {
+  background-color: #ffffff;
+  color: #0b0c0c;
+  box-shadow: 0 2px 0 #B1B4B6;
+  font-weight: bold;
+}
+
+.inverted-button:hover {
+  background-color: #f3f2f1;
+  color: #0b0c0c;
+}
+
+.inverted-button-link {
+  box-shadow: none;
+}
+
+.inverted-button-link:hover {
+  text-decoration-thickness: 2px;
+  background: none;
+}
+
+.ccms-loader {
+  border: 12px solid #DEE0E2;
+  border-radius: 50%;
+  border-top-color: #005EA5;
+  width: 80px;
+  height: 80px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.centre{
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.text-centre{
+  text-align: center;
+}
+
+.permit-reflow {
+  word-break: break-all;
+}
+
+.secret-key-fragment {
+  margin-right: 0.25rem;
+}
+
+.contact {
+  border-left: 1px solid $govuk-border-colour;
+  padding-left: 15px;
+  margin-bottom: 30px;
+  margin-top: 30px;
+}
