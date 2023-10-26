@@ -1,10 +1,10 @@
-import { expect, sinon } from "../../../test/utils/test-utils";
-import { NextFunction, Request, Response } from "express";
-import { pageNotFoundHandler } from "../page-not-found-handler";
-import { mockRequest, mockResponse } from "mock-req-res";
+import {expect, sinon} from "../../../test/utils/test-utils";
+import {NextFunction, Request, Response} from "express";
+import {pageNotFoundHandler} from "../page-not-found-handler";
+import {mockRequest, mockResponse} from "mock-req-res";
 
 describe("serverErrorHandler", () => {
-    let req: Request; 
+    let req: Request;
     let res: Response;
     let next: NextFunction;
 
