@@ -1,10 +1,16 @@
-FROM node:18.12.1-alpine3.16@sha256:67373bd5d90ea600cb5f0fa58d7a5a4e6ebf50b6e05c50c1d1cc22df5134db43 as builder
+FROM node:18.12 as base
 WORKDIR /app
-COPY package.json ./
 COPY package-lock.json ./
+COPY package.json ./
 COPY tsconfig.json ./
 COPY ./src ./src
-RUN npm install && npm run build
+RUN npm install 
+RUN npm run build
+
+FROM node:18.12 as release
+WORKDIR /app
+COPY --from=base /app/node_modules/ node_modules
+COPY --from=base /app/dist/ dist
 
 ENV NODE_ENV "production"
 ENV PORT 3000
