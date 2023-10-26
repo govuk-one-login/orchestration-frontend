@@ -8,14 +8,14 @@ Resources:
   OrchECRRepository:
     Type: "AWS::ECR::Repository"
     Properties:
-      RepositoryName: !Sub ${Enviroment}-orch-frontend-application
+      RepositoryName: !Sub ${Enviroment}-orch-frontend-image-repository
       RepositoryPolicyText:
         Version: "2008-10-17"
         Statement:
           - Sid: AllowPullPushForDeployerRole
             Effect: Allow
             Principal:
-              AWS: !sub "arn:aws:iam::{AWSAccount}:root"
+              AWS: !Sub "arn:aws:iam::${AWSAccount}:root"
             Action:
               - "ecr:GetDownloadUrlForLayer"
               - "ecr:BatchGetImage"
