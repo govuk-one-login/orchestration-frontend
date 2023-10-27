@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { HTTP_STATUS_CODES } from "../app.constants";
+import {NextFunction, Request, Response} from "express";
+import {HTTP_STATUS_CODES} from "../app.constants";
 
 export function pageNotFoundHandler(
     req: Request,

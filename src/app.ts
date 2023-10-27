@@ -6,6 +6,8 @@ import i18next from "i18next";
 import Backend from "i18next-fs-backend";
 import {i18nextConfigurationOptions} from "./config/i18next";
 import i18nextMiddleware from "i18next-http-middleware";
+import {PATH_NAMES} from "./app.constants";
+import {errorPageGet} from "./components/errors/error-controller";
 
 const APP_VIEWS = [
     path.join(__dirname, "components"),
@@ -34,6 +36,7 @@ async function createApp(): Promise<express.Application> {
 
     app.use(i18nextMiddleware.handle(i18next));
 
+    app.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
     app.use(pageNotFoundHandler);
 
     return app;
