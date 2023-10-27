@@ -11,14 +11,13 @@ Create a copy of the .env.sample file and rename it .env
 > To build the app
 
 ```shell script
-npm run build
+npm install && npm run build
 ```
-
 
 ### Start
 
 > To start the app
 
 ```shell script
-npm run start
+npm run build && npm run start
 ```

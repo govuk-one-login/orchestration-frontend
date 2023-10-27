@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  orch-frontend:
+    container_name: orchestration-frontend_orch-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+    environment:
+      - ENVIRONMENT="TEST"
+    restart: on-failure
+
+networks:
+  di-net:
