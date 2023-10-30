@@ -51,6 +51,10 @@ npm run build && npm run start
 
 ## Deploying to Sandpit
 
+It is assumed that the account provisioning stack has already been run and that the persistent resources are present:
+
+- ECR
+
 Sandpit can be deployed using:
 
 ```shell script

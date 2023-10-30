@@ -3,6 +3,8 @@ Parameters:
     Type: String
   AWSAccount:
     Type: String
+  Region:
+    Type: String
 
 Resources:
   OrchECSCluster:
@@ -60,12 +62,12 @@ Resources:
       ExecutionRoleArn: !GetAtt OrchFrontendECSExecutionRole.Arn
       ContainerDefinitions:
         - Name: sandpit-orch-frontend-image
-          Image: !Sub ${AWSAccount}.dkr.ecr.eu-west-2.amazonaws.com/sandpit-orch-frontend-image-repository:latest
+          Image: !Sub ${AWSAccount}.dkr.ecr.${Region}.amazonaws.com/sandpit-orch-frontend-image-repository:latest
           PortMappings:
-            - ContainerPort: 80
+            - ContainerPort: 3000
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: !Ref OrchECSLogGroup
-              awslogs-region: eu-west-2
+              awslogs-region: !Sub ${Region}
               awslogs-stream-prefix: ecs
