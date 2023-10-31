@@ -5,7 +5,10 @@ export interface ProveIdentityCallbackServiceInterface {
 }
 
 export interface ProcessIdentityResponse extends DefaultApiResponse {
-    status: IdentityProcessingStatus;
+    clientName?: string,
+    redirectUri: string,
+    status: IdentityProcessingStatus
+    state?: string;
 }
 
 export enum IdentityProcessingStatus {

@@ -7,11 +7,14 @@ export function proveIdentityCallbackService(): ProveIdentityCallbackServiceInte
             data: {
                 message: "mock",
                 code: -1,
+                clientName: "mockClient",
+                redirectUri: "https://mock-redirect.gov.uk",
                 status: Math.random() < 0.5
                     ? IdentityProcessingStatus.PROCESSING
                     : Math.random() < 0.95
                         ? IdentityProcessingStatus.COMPLETED
-                        : IdentityProcessingStatus.ERROR
+                        : IdentityProcessingStatus.ERROR,
+                state: "mockState"
             },
             success: true
         }

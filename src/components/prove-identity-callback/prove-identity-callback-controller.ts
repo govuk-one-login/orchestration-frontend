@@ -10,14 +10,13 @@ export function proveIdentityCallbackGet(
     service: ProveIdentityCallbackServiceInterface = proveIdentityCallbackService()
 ): ExpressRouteFunc {
     return async function (req: Request, res: Response) {
-        const clientName = "mock"; //req.session.client.name;
 
         // TODO: Get response from ipv-api (ProcessingIdentityHandler)
         const response = await service.processIdentity();
 
         if (response.data.status === IdentityProcessingStatus.PROCESSING) {
             return res.render("prove-identity-callback/index.njk", {
-                serviceName: clientName,
+                serviceName: response.data.clientName,
             });
         }
 
@@ -25,14 +24,14 @@ export function proveIdentityCallbackGet(
 
         if (response.data.status === IdentityProcessingStatus.COMPLETED) {
             // TODO: Get auth token from oidc-api (AuthCodeHandler)
-            redirectPath = getAuthCodeRedirectUri();
+            redirectPath = getAuthCodeRedirectUri(response.data);
 
         } else {
             redirectPath = createServiceRedirectErrorUrl(
-                "http://someservice.com/auth",
+                response.data.redirectUri,
                 OIDC_ERRORS.ACCESS_DENIED,
                 IPV_ERROR_CODES.IDENTITY_PROCESSING_TIMEOUT,
-                "state"
+                response.data.state
             );
         }
 
