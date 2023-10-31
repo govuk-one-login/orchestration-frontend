@@ -34,7 +34,7 @@
     "i18next-fs-backend": "^2.2.0",
     "i18next-http-middleware": "^3.4.1",
     "nunjucks": "^3.2.4",
-    "sass": "^1.69.4"
+    "sass": "^1.69.5"
   },
   "devDependencies": {
     "@types/chai": "^4.3.9",
