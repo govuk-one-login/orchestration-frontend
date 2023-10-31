@@ -1,7 +1,7 @@
 import {ApiResponseResult, DefaultApiResponse} from "../../types";
 
 export interface ProveIdentityCallbackServiceInterface {
-    processIdentity: () => Promise<ApiResponseResult<ProcessIdentityResponse>>;
+    processIdentity: (sessionId: string, clientSessionId: string) => Promise<ApiResponseResult<ProcessIdentityResponse>>;
 }
 
 export interface ProcessIdentityResponse extends DefaultApiResponse {

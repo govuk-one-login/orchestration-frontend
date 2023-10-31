@@ -14,27 +14,14 @@ describe("prove identity callback controller", () => {
     let req: RequestOutput = mockRequest();
     let res: ResponseOutput = mockResponse();
 
-    let mockIdentityProcessed: ApiResponseResult<ProcessIdentityResponse> = {
-        data: {
-            message: "test",
-            code: -1,
-            clientName: "testClient",
-            redirectUri: "http://someservice.com/auth",
-            status: IdentityProcessingStatus.PROCESSING,
-            state: "testState"
-        },
-        success: true
-    }
-
     afterEach(() => {
         sinon.restore();
     });
 
     describe("proveIdentityCallbackGet", () => {
         it("should redirect to auth code when identity processing complete", async () => {
-            mockIdentityProcessed.data.status = IdentityProcessingStatus.COMPLETED;
             const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
-                processIdentity: sinon.fake.returns(mockIdentityProcessed),
+                processIdentity: sinon.fake.returns(mockProcessIdentity(IdentityProcessingStatus.COMPLETED)),
             } as unknown as ProveIdentityCallbackServiceInterface;
 
             await proveIdentityCallbackGet(fakeProveIdentityService)(
@@ -42,13 +29,12 @@ describe("prove identity callback controller", () => {
                 res as Response
             );
 
-            expect(res.redirect).to.have.been.calledWith("http://someservice.com/auth");
+            expect(res.redirect).to.have.been.calledWith("https://mock-successful-redirect.gov.uk");
         });
 
         it("should render index when identity is being processed ", async () => {
-            mockIdentityProcessed.data.status = IdentityProcessingStatus.PROCESSING;
             const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
-                processIdentity: sinon.fake.returns(mockIdentityProcessed),
+                processIdentity: sinon.fake.returns(mockProcessIdentity(IdentityProcessingStatus.PROCESSING)),
             } as unknown as ProveIdentityCallbackServiceInterface;
 
             await proveIdentityCallbackGet(fakeProveIdentityService)(
@@ -62,9 +48,8 @@ describe("prove identity callback controller", () => {
         });
 
         it("should redirect to error page when identity processing has errored", async () => {
-            mockIdentityProcessed.data.status = IdentityProcessingStatus.ERROR;
             const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
-                processIdentity: sinon.fake.returns(mockIdentityProcessed),
+                processIdentity: sinon.fake.returns(mockProcessIdentity(IdentityProcessingStatus.ERROR)),
             } as unknown as ProveIdentityCallbackServiceInterface;
 
             await proveIdentityCallbackGet(fakeProveIdentityService)(
@@ -81,4 +66,18 @@ describe("prove identity callback controller", () => {
             );
         });
     });
+
+    function mockProcessIdentity(status : IdentityProcessingStatus):ApiResponseResult<ProcessIdentityResponse>{
+        return {
+            data: {
+                message: "test",
+                code: -1,
+                clientName: "testClient",
+                redirectUri: "http://someservice.com/auth",
+                status: status,
+                state: "testState"
+            },
+            success: true
+        }
+    }
 });

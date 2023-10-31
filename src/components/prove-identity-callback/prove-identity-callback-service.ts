@@ -8,7 +8,7 @@ export function proveIdentityCallbackService(): ProveIdentityCallbackServiceInte
                 message: "mock",
                 code: -1,
                 clientName: "mockClient",
-                redirectUri: "https://mock-redirect.gov.uk",
+                redirectUri: "https://mock-successful-redirect.gov.uk",
                 status: Math.random() < 0.5
                     ? IdentityProcessingStatus.PROCESSING
                     : Math.random() < 0.95

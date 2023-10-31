@@ -10,9 +10,11 @@ export function proveIdentityCallbackGet(
     service: ProveIdentityCallbackServiceInterface = proveIdentityCallbackService()
 ): ExpressRouteFunc {
     return async function (req: Request, res: Response) {
+        const sessionId = res.locals.sessionId;
+        const clientSessionId = res.locals.clientSessionId;
 
         // TODO: Get response from ipv-api (ProcessingIdentityHandler)
-        const response = await service.processIdentity();
+        const response = await service.processIdentity(sessionId, clientSessionId);
 
         if (response.data.status === IdentityProcessingStatus.PROCESSING) {
             return res.render("prove-identity-callback/index.njk", {
@@ -24,7 +26,7 @@ export function proveIdentityCallbackGet(
 
         if (response.data.status === IdentityProcessingStatus.COMPLETED) {
             // TODO: Get auth token from oidc-api (AuthCodeHandler)
-            redirectPath = getAuthCodeRedirectUri(response.data);
+            redirectPath = getAuthCodeRedirectUri(sessionId, clientSessionId);
 
         } else {
             redirectPath = createServiceRedirectErrorUrl(
