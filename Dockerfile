@@ -1,4 +1,4 @@
-FROM node:18.12 as base
+FROM node:20.9 as base
 WORKDIR /app
 COPY package-lock.json ./
 COPY package.json ./
@@ -7,7 +7,7 @@ COPY ./src ./src
 RUN npm install 
 RUN npm run build
 
-FROM node:18.12 as release
+FROM node:20.9 as release
 WORKDIR /app
 COPY --from=base /app/node_modules/ node_modules
 COPY --from=base /app/dist/ dist
