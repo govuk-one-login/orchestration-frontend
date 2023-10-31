@@ -1,5 +1,5 @@
-import {LOCALE} from "../app.constants";
-import {getServiceDomain, supportLanguageCY} from "../config";
+import { LOCALE } from "../app.constants";
+import { getServiceDomain, supportLanguageCY } from "../config";
 
 export function i18nextConfigurationOptions(
     path: string

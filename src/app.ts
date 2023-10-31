@@ -1,10 +1,10 @@
 import express from "express";
-import {pageNotFoundHandler} from "./handlers/page-not-found-handler";
-import {configureNunjucks} from "./config/templating";
+import { pageNotFoundHandler } from "./handlers/page-not-found-handler";
+import { configureNunjucks } from "./config/templating";
 import path from "path";
 import i18next from "i18next";
 import Backend from "i18next-fs-backend";
-import {i18nextConfigurationOptions} from "./config/i18next";
+import { i18nextConfigurationOptions } from "./config/i18next";
 import i18nextMiddleware from "i18next-http-middleware";
 import {PATH_NAMES} from "./app.constants";
 import {errorPageGet} from "./components/errors/error-controller";
@@ -42,4 +42,4 @@ async function createApp(): Promise<express.Application> {
     return app;
 }
 
-export {createApp};
+export { createApp };

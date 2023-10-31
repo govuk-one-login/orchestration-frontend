@@ -1,5 +1,5 @@
 import request from "supertest";
-import {createApp} from "../../app";
+import { createApp } from "../../app";
 import itParam from "mocha-param";
 
 describe("translations", () => {

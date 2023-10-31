@@ -1,7 +1,7 @@
 import express from "express";
+import i18next, { DefaultNamespace, TFunction } from "i18next";
 import * as nunjucks from "nunjucks";
-import {Environment} from "nunjucks";
-import i18next, {DefaultNamespace, TFunction} from "i18next";
+import { Environment } from "nunjucks";
 
 export function configureNunjucks(
     app: express.Application,
