@@ -9,6 +9,7 @@ Please include reason for the change and any other relevant context.
 ## Change have been demonstrated
 
 Changes to the user interface or content should be demonstrated to Content Design and Interaction Design before being merged. This is to ensure they can make any necessary changes to Figma.
+
 - [ ] Changes to the user interface have been demonstrated
 
 Delete this section if the PR does not change the UI.
