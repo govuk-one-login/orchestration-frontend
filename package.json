@@ -11,6 +11,7 @@
     "build": "npm run build-sass && npx tsc && npm run copy-assets",
     "build-sass": "rm -rf dist/public/style.css dist/govuk-frontend/all-ie8.css && sass --load-path=node_modules/govuk-frontend/govuk --no-source-map --quiet-deps src/assets/scss/application.scss:dist/public/style.css src/assets/scss/ie8.scss:dist/govuk-frontend/all-ie8.css --style compressed",
     "clean": "rm -rf dist node_modules logs.json",
+    "clean-build": "npm run clean && npm i && npm run build",
     "copy-assets": "mkdir -p dist && copyfiles -u 1 src/**/*.njk dist/ src/locales/**/** dist/ src/config/*.txt dist/ && copyfiles -u 3 src/assets/javascript/*.js dist/public/scripts -e **/all.js && cp node_modules/govuk-frontend/govuk/all.js dist/public/scripts",
     "start": "node dist/server.js",
     "test:unit": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --recursive \"src/**/*.test.ts\""
