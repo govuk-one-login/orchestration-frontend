@@ -9,8 +9,9 @@ RUN npm run build
 
 FROM node:20.9 as release
 WORKDIR /app
-COPY --from=base /app/node_modules/ node_modules
-COPY --from=base /app/dist/ dist
+COPY --chown=node:node --from=base /app/package*.json ./
+COPY --chown=node:node --from=base /app/node_modules/ node_modules
+COPY --chown=node:node --from=base /app/dist/ dist
 
 ENV NODE_ENV "production"
 ENV PORT 3000

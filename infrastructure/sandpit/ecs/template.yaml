@@ -1,0 +1,73 @@
+Parameters:
+  Enviroment:
+    Type: String
+  AWSAccount:
+    Type: String
+  Region:
+    Type: String
+
+Resources:
+  OrchECSCluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: !Sub ${Enviroment}-orch-app-cluster
+
+  OrchECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
+
+  OrchFrontendECSExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "ecs-tasks.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+
+  OrchFrontendECSService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
+      Cluster: !Ref OrchECSCluster
+      TaskDefinition: !Ref OrchFontendTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets:
+            - subnet-0027e271c35f828c1
+            - subnet-01b7b1c835828eb3d
+            - subnet-0b648700a8ac43736
+          SecurityGroups:
+            - sg-0d571f01baff4379a
+            - sg-01607dd8a81407734
+            - sg-0bf931c1887e0cff7
+            - sg-0e45bfc8984bb6bd3
+  OrchFontendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
+      Cpu: 256
+      Memory: 0.5GB
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !GetAtt OrchFrontendECSExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: sandpit-orch-frontend-image
+          Image: !Sub ${AWSAccount}.dkr.ecr.${Region}.amazonaws.com/sandpit-orch-frontend-image-repository:latest
+          PortMappings:
+            - ContainerPort: 3000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref OrchECSLogGroup
+              awslogs-region: !Sub ${Region}
+              awslogs-stream-prefix: ecs
