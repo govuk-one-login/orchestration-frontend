@@ -9,5 +9,4 @@ node_modules/
 
 # Additional ignores
 .idea
-
 .aws-sam

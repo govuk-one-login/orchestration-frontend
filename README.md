@@ -60,3 +60,25 @@ Sandpit can be deployed using:
 ```shell script
 ./deploy-sandpit.sh
 ```
+
+## Linting
+
+### Scripts
+
+> To run linting
+
+```shell script
+npm run lint
+```
+
+> To run prettier
+
+```shell script
+npm run pretty
+```
+
+> To setup pre-commit hook
+
+```shell script
+npm run prepare
+```

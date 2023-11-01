@@ -13,7 +13,9 @@
     "copy-assets": "mkdir -p dist && copyfiles -u 1 src/**/*.njk dist/ src/locales/**/** dist/ src/config/*.txt dist/ && copyfiles -u 3 src/assets/javascript/*.js dist/public/scripts -e **/all.js && cp node_modules/govuk-frontend/govuk/all.js dist/public/scripts",
     "start": "node dist/server.js",
     "test:unit": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --recursive \"src/**/*.test.ts\"",
-    "lint": "eslint . --ext .ts,.js **/translation.json"
+    "lint": "eslint . --ext .ts,.js **/translation.json",
+    "pretty": "prettier --write \"*/**/*.{ts,json}\"",
+    "prepare": "husky install"
   },
   "mocha": {
     "diff": true,
@@ -64,6 +66,7 @@
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "husky": "^8.0.0",
     "mocha": "^10.2.0",
     "mocha-param": "^2.0.1",
     "mock-req-res": "^1.2.1",
