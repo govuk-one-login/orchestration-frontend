@@ -6,7 +6,7 @@ import {Request, Response} from "express";
 
 import {IPV_ERROR_CODES, OIDC_ERRORS,} from "../../../app.constants";
 import {mockRequest, mockResponse, RequestOutput, ResponseOutput,} from "mock-req-res";
-import {proveIdentityCallbackGet} from "../prove-identity-callback-controller";
+import {proveIdentityCallbackGet, proveIdentityCallbackSessionExpiryError} from "../prove-identity-callback-controller";
 import {IdentityProcessingStatus, ProcessIdentityResponse, ProveIdentityCallbackServiceInterface,} from "../types";
 import {ApiResponseResult} from "../../../types";
 
@@ -67,7 +67,7 @@ describe("prove identity callback controller", () => {
         });
     });
 
-    function mockProcessIdentity(status : IdentityProcessingStatus):ApiResponseResult<ProcessIdentityResponse>{
+    function mockProcessIdentity(status: IdentityProcessingStatus): ApiResponseResult<ProcessIdentityResponse> {
         return {
             data: {
                 message: "test",
@@ -80,4 +80,14 @@ describe("prove identity callback controller", () => {
             success: true
         }
     }
+
+    describe("proveIdentityCallbackSessionExpiryError", () => {
+        it("should redirect to error page when callback session expires", () => {
+            const expectedTemplate = "prove-identity-callback/session-expiry-error.njk";
+
+            proveIdentityCallbackSessionExpiryError(req, res);
+
+            expect(res.render).to.have.been.calledWith(expectedTemplate);
+        });
+    });
 });
