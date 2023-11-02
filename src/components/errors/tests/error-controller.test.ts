@@ -18,13 +18,13 @@ describe("errorController", () => {
     sinon.restore();
   });
 
-  it("should render 500 template if page not found", () => {
+  it("should render 500 template if internal server error", () => {
     const expectedTemplate = "errors/500.njk";
 
     expect(res.render).to.have.been.calledOnceWith(expectedTemplate);
   });
 
-  it("should return a 500 status code if page not found", () => {
+  it("should return a 500 status code if internal server error", () => {
     expect(res.status).to.have.been.calledOnceWith(500);
   });
 });

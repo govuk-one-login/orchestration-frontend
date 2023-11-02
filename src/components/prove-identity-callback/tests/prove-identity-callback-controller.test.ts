@@ -14,8 +14,8 @@ import { IdentityProcessingStatus, ProcessIdentityResponse, ProveIdentityCallbac
 import { ApiResponseResult } from "../../../types";
 
 describe("prove identity callback controller", () => {
-  let req: RequestOutput = mockRequest();
-  let res: ResponseOutput = mockResponse();
+  const req: RequestOutput = mockRequest();
+  const res: ResponseOutput = mockResponse();
 
   afterEach(() => {
     sinon.restore();

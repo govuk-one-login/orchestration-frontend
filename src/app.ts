@@ -7,11 +7,12 @@ import i18next from "i18next";
 import Backend from "i18next-fs-backend";
 import { i18nextConfigurationOptions } from "./config/i18next";
 import i18nextMiddleware from "i18next-http-middleware";
-import { PATH_NAMES } from "./app.constants";
-import { errorPageGet } from "./components/errors/error-controller";
 import { proveIdentityCallbackRouter } from "./components/prove-identity-callback/prove-identity-callback-routes";
 import { noCacheMiddleware } from "./middleware/no-cache-middleware";
 import { getSessionIdMiddleware } from "./middleware/session-middleware";
+import { serverErrorHandler } from "./handlers/internal-server-error-handler";
+import { errorPageGet } from "./components/errors/error-controller";
+import { PATH_NAMES } from "./app.constants";
 
 const APP_VIEWS = [
   path.join(__dirname, "components"),
@@ -47,6 +48,7 @@ async function createApp(): Promise<express.Application> {
 
   app.use(proveIdentityCallbackRouter);
   app.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
+  app.use(serverErrorHandler);
   app.use(pageNotFoundHandler);
 
   return app;
