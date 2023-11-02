@@ -14,15 +14,13 @@ describe("errorController", () => {
     res = {
       headersSent: false,
       statusCode: 200,
-      render: () => {
-      },
+      render: () => {},
       status: function (newStatus: number) {
         this.statusCode = newStatus;
       },
     } as unknown as Response;
     next = sinon.spy();
   });
-
 
   afterEach(() => {
     sinon.restore();
