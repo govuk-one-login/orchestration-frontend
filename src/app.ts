@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import { pageNotFoundHandler } from "./handlers/page-not-found-handler";
 import { configureNunjucks } from "./config/templating";
 import path from "path";
@@ -8,6 +9,9 @@ import { i18nextConfigurationOptions } from "./config/i18next";
 import i18nextMiddleware from "i18next-http-middleware";
 import { PATH_NAMES } from "./app.constants";
 import { errorPageGet } from "./components/errors/error-controller";
+import { proveIdentityCallbackRouter } from "./components/prove-identity-callback/prove-identity-callback-routes";
+import { noCacheMiddleware } from "./middleware/no-cache-middleware";
+import { getSessionIdMiddleware } from "./middleware/session-middleware";
 
 const APP_VIEWS = [
   path.join(__dirname, "components"),
@@ -16,6 +20,8 @@ const APP_VIEWS = [
 
 async function createApp(): Promise<express.Application> {
   const app: express.Application = express();
+
+  app.use(noCacheMiddleware);
 
   app.use(
     "/assets",
@@ -33,13 +39,13 @@ async function createApp(): Promise<express.Application> {
         path.join(__dirname, "locales/{{lng}}/{{ns}}.json")
       )
     );
-
   app.use(i18nextMiddleware.handle(i18next));
 
-  app.use(pageNotFoundHandler);
+  app.use(cookieParser());
 
-  app.use(i18nextMiddleware.handle(i18next));
+  app.use(getSessionIdMiddleware);
 
+  app.use(proveIdentityCallbackRouter);
   app.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
   app.use(pageNotFoundHandler);
 

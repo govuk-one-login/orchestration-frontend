@@ -99,6 +99,14 @@
       "announceHidden": "Your retyped password is hidden"
     }
   },
+  "pages": {
+    "proveIdentityCheck": {
+      "title": "Returning you to the ‘[serviceName]’ service",
+      "header": "Returning you to the ‘[serviceName]’ service",
+      "paragraph1": "Please wait",
+      "paragraph2": "We’re still trying"
+    }
+  },
   "error": {
     "error404": {
       "title": "Page not found",
@@ -118,6 +126,18 @@
       "header": "Sorry, there is a problem",
       "content": {
         "paragraph1": "Try again later."
+      }
+    },
+    "proveIdentityCallbackSessionExpiryError": {
+      "title": "Sorry, there is a problem",
+      "header": "Sorry, there is a problem",
+      "content": {
+        "paragraph": "We cannot return you to the service at the moment.",
+        "section1": {
+          "header": "What you can do",
+          "paragraph1": "Go back to the service you were trying to use. You can look for the service using your search engine or find it from the GOV.UK homepage.",
+          "paragraph2": "You will not need to prove your identity again."
+        }
       }
     }
   }
