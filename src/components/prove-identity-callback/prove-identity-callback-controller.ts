@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { ExpressRouteFunc } from "../../types";
-import { IdentityProcessingStatus, ProveIdentityCallbackServiceInterface } from "./types";
+import {
+  IdentityProcessingStatus,
+  ProveIdentityCallbackServiceInterface,
+} from "./types";
 import { IPV_ERROR_CODES, OIDC_ERRORS } from "../../app.constants";
 import { createServiceRedirectErrorUrl } from "../../utils/error";
 import { proveIdentityCallbackService } from "./prove-identity-callback-service";
@@ -27,7 +30,6 @@ export function proveIdentityCallbackGet(
     if (response.data.status === IdentityProcessingStatus.COMPLETED) {
       // TODO: Get auth token from oidc-api (AuthCodeHandler)
       redirectPath = getAuthCodeRedirectUri(sessionId, clientSessionId);
-
     } else {
       redirectPath = createServiceRedirectErrorUrl(
         response.data.redirectUri,
