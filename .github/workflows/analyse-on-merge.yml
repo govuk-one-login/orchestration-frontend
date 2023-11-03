@@ -1,0 +1,34 @@
+name: analyse on merge checks
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get Node.js version
+        run: |
+          version=$(grep -oP '(?<="node": ")[^"]*' package.json)
+          echo "NODE_VERSION=$version" >> $GITHUB_ENV
+
+      - name: Using Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Run check:lint
+        run: npm run check:lint
+      - name: Run check:pretty
+        run: npm run check:pretty
+      - name: Run unit tests
+        run: npm run test:unit
+      - name: Run integration tests
+        run: npm run test:integration
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

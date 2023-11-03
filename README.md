@@ -61,20 +61,24 @@ Sandpit can be deployed using:
 ./deploy-sandpit.sh
 ```
 
-## Linting
+## Formatting & Linting
 
-### Scripts
+### Scripts:
 
-> To run linting
+> To check:
 
 ```shell script
-npm run lint
+npm run check; # Check all
+npm run check:pretty; # Check prettier
+npm run check:lint; # Check linting
 ```
 
-> To run prettier
+> To fix formatting/linting:
 
 ```shell script
-npm run pretty
+npm run fix; # Fix all
+npm run fix:pretty; # Fix prettier
+npm run fix:lint; # Fix linting
 ```
 
 > To setup pre-commit hook
