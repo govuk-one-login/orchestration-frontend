@@ -14,9 +14,15 @@
     "clean-build": "npm run clean && npm i && npm run build",
     "copy-assets": "mkdir -p dist && copyfiles -u 1 src/**/*.njk dist/ src/locales/**/** dist/ src/config/*.txt dist/ && copyfiles -u 3 src/assets/javascript/*.js dist/public/scripts -e **/all.js && cp node_modules/govuk-frontend/govuk/all.js dist/public/scripts",
     "start": "node dist/server.js",
-    "test:unit": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --recursive \"src/**/*.test.ts\"",
-    "lint": "eslint . --ext .ts,.js **/translation.json",
-    "pretty": "prettier --write \"*/**/*.{ts,json}\"",
+    "test:unit": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --exclude \"src/**/*-integration.test.ts\" --recursive \"src/**/*.test.ts\"",
+    "test:integration": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --recursive \"src/**/*-integration.test.ts\"",
+    "test": "npm run test:unit && npm run test:integration",
+    "check:pretty": "prettier --check \"*/**/*.{ts,json}\"",
+    "check:lint": "eslint . --ext .ts,.js **/translation.json",
+    "check": "npm run check:lint && npm run check:pretty",
+    "fix:lint": "eslint . --ext .ts,.js **/translation.json --fix",
+    "fix:pretty": "prettier --write \"*/**/*.{ts,json}\"",
+    "fix": "npm run fix:lint && npm run fix:pretty",
     "prepare": "husky install"
   },
   "mocha": {
