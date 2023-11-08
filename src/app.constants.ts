@@ -19,9 +19,9 @@ export const OIDC_ERRORS = {
 };
 
 export const PATH_NAMES = {
-  ACCOUNT_SUSPENDED: "/unavailable",
   PROVE_IDENTITY_CALLBACK: "/ipv-callback",
   PROVE_IDENTITY_CALLBACK_SESSION_EXPIRY_ERROR:
     "/ipv-callback-session-expiry-error",
+  UNAVAILABLE: "/unavailable",
   ERROR_PAGE: "/error",
 };
