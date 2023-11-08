@@ -13,6 +13,7 @@ import { getSessionIdMiddleware } from "./middleware/session-middleware";
 import { serverErrorHandler } from "./handlers/internal-server-error-handler";
 import { errorPageGet } from "./components/errors/error-controller";
 import { PATH_NAMES } from "./app.constants";
+import { permanentlyLockedController } from "./components/permanently-locked/permanently-locked-controller";
 import { suspendedPageController } from "./components/suspended-page/suspended-page-controller";
 
 const APP_VIEWS = [
@@ -48,6 +49,7 @@ async function createApp(): Promise<express.Application> {
   app.use(getSessionIdMiddleware);
 
   app.use(proveIdentityCallbackRouter);
+  app.get(PATH_NAMES.NOT_AVAILABLE, permanentlyLockedController);
   app.get(PATH_NAMES.UNAVAILABLE, suspendedPageController);
   app.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
   app.use(serverErrorHandler);
