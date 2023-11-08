@@ -1,0 +1,11 @@
+{% extends "common/layout/base.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% set pageTitleName = 'pages.suspendedPageScreen.title' | translate %}
+
+{% block content %}
+    <h1 class="govuk-heading-l">{{'pages.suspendedPageScreen.header' | translate }}</h1>
+    <p class="govuk-body">{{ 'pages.suspendedPageScreen.content.paragraph1' | translate }}</p>
+    <p class="govuk-heading-m">{{ 'pages.suspendedPageScreen.content.whatYouCanDo' | translate }}</p>
+    <p class="govuk-body">{{ 'pages.suspendedPageScreen.content.paragraph2' | translate }}</p>
+    <p class="govuk-body">{{ 'pages.suspendedPageScreen.content.paragraph3' | translate }}</p>
+{% endblock %}
