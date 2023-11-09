@@ -1,17 +1,16 @@
-name: Pre-merge checks
+name: Run Checks
+
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - ready_for_review
-      - synchronize
-  merge_group:
+  workflow_call:
+    secrets:
+      SAM_APP_VALIDATE_ROLE_ARN:
+        required: true
+      SONAR_TOKEN:
+        required: true
 
 jobs:
-  run-tests:
+  linting-formatting-testing:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,6 +36,36 @@ jobs:
         run: npm run test:unit
       - name: Run integration tests
         run: npm run test:integration
+
+  sam-validation:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up SAM cli
+        uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.SAM_APP_VALIDATE_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: SAM validate
+        run: sam validate
+        working-directory: infrastructure/sandpit/ecs
+
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: SonarCloud Scan
         if: ${{ github.actor != 'dependabot[bot]' }}
         uses: sonarsource/sonarcloud-github-action@master

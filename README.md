@@ -86,3 +86,15 @@ npm run fix:lint; # Fix linting
 ```shell script
 npm run prepare
 ```
+
+## GitHub Secrets:
+
+Deployment relies on several secrets stored in GitHub:
+
+| Secret                    | Description                                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| ARTIFACT_BUCKET_NAME      | This is the bucket that the SAM template will be pushed to.                                                                    |
+| ECR_REGISTRY              | This is the address of the ECR registry.                                                                                       |
+| GH_ACTIONS_ROLE_ARN       | This is the role GitHub actions assumes with permission to push to the artifact bucket (defined by the previsioning pipeline). |
+| SAM_APP_VALIDATE_ROLE_ARN | This is the role GitHub actions assumes with permission to validate the SAM template (defined by the previsioning pipeline).   |
+| SONAR_TOKEN               | This is used to trigger SonarCloud.                                                                                            |
