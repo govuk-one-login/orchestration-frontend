@@ -1,8 +1,8 @@
-name: analyse on merge checks
+name: Analyse on merge checks
 on:
   push:
     branches:
-      - main
+      - ATO-78/github-action-push-to-aws
 
 jobs:
   run-tests:
