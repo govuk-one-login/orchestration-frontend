@@ -1,19 +1,60 @@
 name: Deploy frontend
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
-  workflow_run:
-    workflows: ["Build and push frontend"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
-  deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  run-checks:
+    uses: ./.github/workflows/run-checks.yml
+    secrets:
+      SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.SAM_APP_VALIDATE_ROLE_ARN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build-and-push-docker:
+    needs: run-checks
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
       id-token: write
       contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN }}
+          aws-region: eu-west-2
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+      - name: Build, tag, and push frontend
+        env:
+          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REPOSITORY: container-image-repository-containerrepository-wq0h3xnzwsdw
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  deploy-frontend:
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: infrastructure/sandpit/ecs
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,15 +65,11 @@ jobs:
           role-to-assume: ${{ secrets.GH_ACTIONS_ROLE_ARN }}
           aws-region: eu-west-2
 
-      - name: SAM validate
-        run: sam validate
-
-      - name: SAM build and test
+      - name: SAM build
         run: sam build
 
       - name: Deploy SAM app
         uses: alphagov/di-devplatform-upload-action@v3.3
         with:
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
-          signing-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
           working-directory: infrastructure/sandpit/ecs/.aws-sam/build
