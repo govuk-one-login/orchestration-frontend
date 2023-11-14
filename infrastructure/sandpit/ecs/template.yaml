@@ -7,6 +7,7 @@ Parameters:
     Type: String
 
 Resources:
+  # ECS
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
@@ -31,6 +32,7 @@ Resources:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 
   OrchFrontendECSService:
+    DependsOn: OrchFrontendAlbListener
     Type: AWS::ECS::Service
     Properties:
       ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
@@ -46,6 +48,12 @@ Resources:
             - subnet-01b7b1c835828eb3d
             - subnet-0b648700a8ac43736
           SecurityGroups:
+            - !Ref OrchFrontendECSTaskSecurityGroup
+      LoadBalancers:
+        - ContainerName: sandpit-orch-frontend-image
+          ContainerPort: 3000
+          TargetGroupArn: !Ref OrchFrontendAlbTargetGroup
+
   OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -67,3 +75,79 @@ Resources:
               awslogs-group: !Ref OrchECSLogGroup
               awslogs-region: !Sub ${Region}
               awslogs-stream-prefix: ecs
+
+  # Application Load Balancer
+  OrchFrontendAlb:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-alb
+      Subnets:
+        - subnet-0027e271c35f828c1
+        - subnet-01b7b1c835828eb3d
+        - subnet-0b648700a8ac43736
+      SecurityGroups:
+        - !Ref OrchFrontendAlbSecurityGroup
+
+  OrchFrontendAlbTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-alb-tg
+      Port: 3000
+      Protocol: HTTP
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "traffic-port"
+      HealthCheckPath: "/health"
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+
+  OrchFrontendAlbListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OrchFrontendAlbTargetGroup
+      LoadBalancerArn: !Ref OrchFrontendAlb
+      Port: 80
+      Protocol: HTTP
+
+  # Security Groups
+  OrchFrontendECSTaskSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for ECS Tasks"
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref OrchFrontendAlbSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: "0.0.0.0/0"
+
+  OrchFrontendAlbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for OrchFrontendAlb"
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: "tcp"
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0"
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: "0.0.0.0/0"
