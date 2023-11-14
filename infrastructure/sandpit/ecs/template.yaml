@@ -1,5 +1,5 @@
 Parameters:
-  Enviroment:
+  Environment:
     Type: String
   AWSAccount:
     Type: String
@@ -10,12 +10,12 @@ Resources:
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
-      ClusterName: !Sub ${Enviroment}-orch-app-cluster
+      ClusterName: !Sub ${Environment}-orch-app-cluster
 
   OrchECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
+      LogGroupName: !Sub /ecs/${Environment}-orch-frontend
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -33,9 +33,9 @@ Resources:
   OrchFrontendECSService:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
+      ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
       Cluster: !Ref OrchECSCluster
-      TaskDefinition: !Ref OrchFontendTaskDefinition
+      TaskDefinition: !Ref OrchFrontendTaskDefinition
       DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
@@ -46,14 +46,10 @@ Resources:
             - subnet-01b7b1c835828eb3d
             - subnet-0b648700a8ac43736
           SecurityGroups:
-            - sg-0d571f01baff4379a
-            - sg-01607dd8a81407734
-            - sg-0bf931c1887e0cff7
-            - sg-0e45bfc8984bb6bd3
-  OrchFontendTaskDefinition:
+  OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
+      Family: !Sub ${Environment}-orch-frontend-ecs-task-definition
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
