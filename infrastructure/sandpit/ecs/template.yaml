@@ -115,6 +115,45 @@ Resources:
       Port: 80
       Protocol: HTTP
 
+  # Network Load Balancer
+  OrchFrontendNlb:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-nlb
+      Type: network
+      Subnets:
+        - subnet-0027e271c35f828c1
+        - subnet-01b7b1c835828eb3d
+        - subnet-0b648700a8ac43736
+      SecurityGroups:
+        - !Ref OrchFrontendNlbSecurityGroup
+
+  OrchFrontendNlbTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-nlb-tg
+      Port: 80
+      Protocol: TCP
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      TargetType: alb
+      Targets:
+        - Id: !Ref OrchFrontendAlb
+      TargetType: alb
+      HealthCheckPort: "traffic-port"
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+
+  OrchFrontendNlbListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OrchFrontendNlbTargetGroup
+      LoadBalancerArn: !Ref OrchFrontendNlb
+      Port: 80
+      Protocol: TCP
+
   # Security Groups
   OrchFrontendECSTaskSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -151,3 +190,34 @@ Resources:
           FromPort: 0
           ToPort: 65535
           CidrIp: "0.0.0.0/0"
+
+  OrchFrontendNlbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for OrchFrontendNlb"
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0"
+        - IpProtocol: "tcp"
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0"
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: "0.0.0.0/0"
+
+Outputs:
+  # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
+  OrchFrontendNlbDnsName:
+    Description: The DNS Name of the Orchestration Frontend NLB
+    Value: !GetAtt OrchFrontendNlb.DNSName
+
+  OrchFrontendNlbArn:
+    Description: The ARN of the Orchestration Frontend NLB
+    Value: !Ref OrchFrontendNlb
+
