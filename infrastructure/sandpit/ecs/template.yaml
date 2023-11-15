@@ -180,16 +180,16 @@ Resources:
         - IpProtocol: "tcp"
           FromPort: 80
           ToPort: 80
-          CidrIp: "0.0.0.0/0"
+          CidrIp: "10.0.0.0/16"
         - IpProtocol: "tcp"
-          FromPort: 443
-          ToPort: 443
-          CidrIp: "0.0.0.0/0"
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: "10.0.0.0/16"
       SecurityGroupEgress:
         - IpProtocol: "-1"
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: "0.0.0.0/0"
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: "10.0.0.0/16"
 
   OrchFrontendNlbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
@@ -201,15 +201,11 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: "0.0.0.0/0"
-        - IpProtocol: "tcp"
-          FromPort: 443
-          ToPort: 443
-          CidrIp: "0.0.0.0/0"
       SecurityGroupEgress:
         - IpProtocol: "-1"
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: "0.0.0.0/0"
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref OrchFrontendAlbSecurityGroup
 
 Outputs:
   # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
