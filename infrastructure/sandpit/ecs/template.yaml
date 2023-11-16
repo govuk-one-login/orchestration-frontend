@@ -154,58 +154,108 @@ Resources:
       Port: 80
       Protocol: TCP
 
-  # Security Groups
+  # Security Groups and Ingress / Egress rules
   OrchFrontendECSTaskSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for ECS Tasks"
       VpcId: vpc-0b6f4a5d72f84ed0c
-      SecurityGroupIngress:
-        - IpProtocol: "tcp"
-          FromPort: 3000
-          ToPort: 3000
-          SourceSecurityGroupId: !Ref OrchFrontendAlbSecurityGroup
-      SecurityGroupEgress:
-        - IpProtocol: "-1"
-          FromPort: 0
-          ToPort: 65535
-          CidrIp: "0.0.0.0/0"
+
+  OrchFrontendECSTaskSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 3000
+      ToPort: 3000
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+  
+  OrchFrontendECSTaskSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: "0.0.0.0/0"
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
 
   OrchFrontendAlbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendAlb"
       VpcId: vpc-0b6f4a5d72f84ed0c
-      SecurityGroupIngress:
-        - IpProtocol: "tcp"
-          FromPort: 80
-          ToPort: 80
-          CidrIp: "10.0.0.0/16"
-        - IpProtocol: "tcp"
-          FromPort: 3000
-          ToPort: 3000
-          CidrIp: "10.0.0.0/16"
-      SecurityGroupEgress:
-        - IpProtocol: "-1"
-          FromPort: 3000
-          ToPort: 3000
-          CidrIp: "10.0.0.0/16"
+
+  OrchFrontendAlbSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+  
+  OrchFrontendAlbSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 3000
+      ToPort: 3000
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
 
   OrchFrontendNlbSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendNlb"
       VpcId: vpc-0b6f4a5d72f84ed0c
-      SecurityGroupIngress:
-        - IpProtocol: "tcp"
-          FromPort: 80
-          ToPort: 80
-          CidrIp: "0.0.0.0/0"
-      SecurityGroupEgress:
-        - IpProtocol: "-1"
-          FromPort: 80
-          ToPort: 80
-          SourceSecurityGroupId: !Ref OrchFrontendAlbSecurityGroup
+
+  OrchFrontendNlbSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 80
+      ToPort: 80
+      CidrIp: "0.0.0.0/0"
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+
+  OrchFrontendNlbSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 80
+      ToPort: 80
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
 
 Outputs:
   # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
