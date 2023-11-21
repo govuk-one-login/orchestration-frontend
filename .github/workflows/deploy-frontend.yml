@@ -7,7 +7,7 @@ permissions:
 on:
   push:
     branches:
-      - main
+      - ATO-186/update-infrastructure-to-fully-support-ci
 
 jobs:
   run-checks:

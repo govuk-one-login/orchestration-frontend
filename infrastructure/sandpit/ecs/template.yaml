@@ -9,12 +9,16 @@ Globals:
       - !Ref AWS::NoValue
 
 Parameters:
-  Enviroment:
+  Environment:
     Type: String
-  AWSAccount:
+    Description: The name of the environment to deploy to
+  VpcStackName:
     Type: String
-  Region:
+    Description: The name of the stack used to create the VPC
+  CodeSigningConfigArn:
     Type: String
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Default: none
   PermissionsBoundary:
     Type: String
     Description: The ARN of the permissions boundary to apply when creating IAM roles
@@ -29,12 +33,12 @@ Resources:
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
-      ClusterName: !Sub ${Enviroment}-orch-app-cluster
+      ClusterName: !Sub ${Environment}-orch-app-cluster
 
   OrchECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
+      LogGroupName: !Sub /ecs/${Environment}-orch-frontend
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -57,7 +61,7 @@ Resources:
     DependsOn: OrchFrontendAlbListener
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
+      ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
       Cluster: !Ref OrchECSCluster
       TaskDefinition: !Ref OrchFrontendTaskDefinition
       DesiredCount: 1
@@ -66,9 +70,9 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           Subnets:
-            - subnet-0027e271c35f828c1
-            - subnet-01b7b1c835828eb3d
-            - subnet-0b648700a8ac43736
+            - subnet-0665fe32d17da80a4
+            - subnet-021237bf29d8ef36d
+            - subnet-04f1a57cc631f1a4c
           SecurityGroups:
             - !Ref OrchFrontendECSTaskSecurityGroup
       LoadBalancers:
@@ -79,7 +83,7 @@ Resources:
   OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
+      Family: !Sub ${Environment}-orch-frontend-ecs-task-definition
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
@@ -88,14 +92,14 @@ Resources:
       ExecutionRoleArn: !GetAtt OrchFrontendECSExecutionRole.Arn
       ContainerDefinitions:
         - Name: sandpit-orch-frontend-image
-          Image: !Sub ${AWSAccount}.dkr.ecr.${Region}.amazonaws.com/sandpit-orch-frontend-image-repository:latest
+          Image: "CONTAINER-IMAGE-PLACEHOLDER"
           PortMappings:
             - ContainerPort: 3000
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: !Ref OrchECSLogGroup
-              awslogs-region: !Sub ${Region}
+              awslogs-region: !Sub ${AWS::Region}
               awslogs-stream-prefix: ecs
 
   # Application Load Balancer
@@ -104,9 +108,9 @@ Resources:
     Properties:
       Name: !Sub ${Environment}-orch-frontend-alb
       Subnets:
-        - subnet-0027e271c35f828c1
-        - subnet-01b7b1c835828eb3d
-        - subnet-0b648700a8ac43736
+        - subnet-0665fe32d17da80a4
+        - subnet-021237bf29d8ef36d
+        - subnet-04f1a57cc631f1a4c
       SecurityGroups:
         - !Ref OrchFrontendAlbSecurityGroup
 
@@ -116,7 +120,7 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-alb-tg
       Port: 3000
       Protocol: HTTP
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: vpc-0301476c3d16323a3
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
@@ -144,9 +148,9 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-nlb
       Type: network
       Subnets:
-        - subnet-0027e271c35f828c1
-        - subnet-01b7b1c835828eb3d
-        - subnet-0b648700a8ac43736
+        - subnet-0665fe32d17da80a4
+        - subnet-021237bf29d8ef36d
+        - subnet-04f1a57cc631f1a4c
       SecurityGroups:
         - !Ref OrchFrontendNlbSecurityGroup
 
@@ -156,7 +160,7 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-nlb-tg
       Port: 80
       Protocol: TCP
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: vpc-0301476c3d16323a3
       TargetType: alb
       Targets:
         - Id: !Ref OrchFrontendAlb
@@ -181,7 +185,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for ECS Tasks"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: vpc-0301476c3d16323a3
 
   OrchFrontendECSTaskSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -214,7 +218,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendAlb"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: vpc-0301476c3d16323a3
 
   OrchFrontendAlbSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -250,7 +254,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendNlb"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: vpc-0301476c3d16323a3
 
   OrchFrontendNlbSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
