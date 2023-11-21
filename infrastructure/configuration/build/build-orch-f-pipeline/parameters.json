@@ -1,7 +1,7 @@
 [
     {
       "ParameterKey": "Environment",
-      "ParameterValue": "dev"
+      "ParameterValue": "build"
     },
     {
       "ParameterKey": "OneLoginRepositoryName",
@@ -17,14 +17,14 @@
     },
     {
       "ParameterKey": "SAMStackName",
-      "ParameterValue": "orch-frontend-deploy"
+      "ParameterValue": "build-orch-f-deploy"
     },
     {
       "ParameterKey": "SigningProfileArn",
-      "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY"
+      "ParameterValue": "arn:aws:signer:eu-west-2:519368372183:/signing-profiles/SigningProfile_d63POiCvRt0m"
     },
     {
       "ParameterKey": "SigningProfileVersionArn",
-      "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY/hsozMWacYH"
+      "ParameterValue": "arn:aws:signer:eu-west-2:519368372183:/signing-profiles/SigningProfile_d63POiCvRt0m/Xgu7Dqs3Eq"
     }
   ]

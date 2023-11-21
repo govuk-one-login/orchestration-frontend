@@ -9,6 +9,12 @@ Globals:
       - !Ref AWS::NoValue
 
 Parameters:
+  Enviroment:
+    Type: String
+  AWSAccount:
+    Type: String
+  Region:
+    Type: String
   PermissionsBoundary:
     Type: String
     Description: The ARN of the permissions boundary to apply when creating IAM roles
@@ -23,12 +29,12 @@ Resources:
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
-      ClusterName: !Sub dev-orch-app-cluster
+      ClusterName: !Sub ${Enviroment}-orch-app-cluster
 
   OrchECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/dev-orch-frontend
+      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -51,7 +57,7 @@ Resources:
     DependsOn: OrchFrontendAlbListener
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub dev-orch-frontend-ecs-service
+      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
       Cluster: !Ref OrchECSCluster
       TaskDefinition: !Ref OrchFrontendTaskDefinition
       DesiredCount: 1
@@ -73,7 +79,7 @@ Resources:
   OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub dev-orch-frontend-ecs-task-definition
+      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
@@ -82,14 +88,14 @@ Resources:
       ExecutionRoleArn: !GetAtt OrchFrontendECSExecutionRole.Arn
       ContainerDefinitions:
         - Name: sandpit-orch-frontend-image
-          Image: !Sub 761723964695.dkr.ecr.eu-west-2.amazonaws.com/sandpit-orch-frontend-image-repository:latest
+          Image: !Sub ${AWSAccount}.dkr.ecr.${Region}.amazonaws.com/sandpit-orch-frontend-image-repository:latest
           PortMappings:
             - ContainerPort: 3000
           LogConfiguration:
             LogDriver: awslogs
             Options:
               awslogs-group: !Ref OrchECSLogGroup
-              awslogs-region: !Sub eu-west-2
+              awslogs-region: !Sub ${Region}
               awslogs-stream-prefix: ecs
 
   # Application Load Balancer

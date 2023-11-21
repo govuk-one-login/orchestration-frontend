@@ -2,8 +2,6 @@
 
 Clone the repo https://github.com/alphagov/di-devplatform-deploy in a directory next to this repo.
 
-Copy each of the configuration/<env>/vpc/parameters.json.templates files to parameters.json 
-
 ### Required CLIs
 
 To run this tool you will need the below CLI's
