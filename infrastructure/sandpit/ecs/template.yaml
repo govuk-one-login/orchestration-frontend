@@ -1,5 +1,5 @@
 Parameters:
-  Enviroment:
+  Environment:
     Type: String
   AWSAccount:
     Type: String
@@ -7,15 +7,16 @@ Parameters:
     Type: String
 
 Resources:
+  # ECS
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
-      ClusterName: !Sub ${Enviroment}-orch-app-cluster
+      ClusterName: !Sub ${Environment}-orch-app-cluster
 
   OrchECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
+      LogGroupName: !Sub /ecs/${Environment}-orch-frontend
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -31,11 +32,12 @@ Resources:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 
   OrchFrontendECSService:
+    DependsOn: OrchFrontendAlbListener
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
+      ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
       Cluster: !Ref OrchECSCluster
-      TaskDefinition: !Ref OrchFontendTaskDefinition
+      TaskDefinition: !Ref OrchFrontendTaskDefinition
       DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
@@ -46,14 +48,16 @@ Resources:
             - subnet-01b7b1c835828eb3d
             - subnet-0b648700a8ac43736
           SecurityGroups:
-            - sg-0d571f01baff4379a
-            - sg-01607dd8a81407734
-            - sg-0bf931c1887e0cff7
-            - sg-0e45bfc8984bb6bd3
-  OrchFontendTaskDefinition:
+            - !Ref OrchFrontendECSTaskSecurityGroup
+      LoadBalancers:
+        - ContainerName: sandpit-orch-frontend-image
+          ContainerPort: 3000
+          TargetGroupArn: !Ref OrchFrontendAlbTargetGroup
+
+  OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
+      Family: !Sub ${Environment}-orch-frontend-ecs-task-definition
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
@@ -71,3 +75,195 @@ Resources:
               awslogs-group: !Ref OrchECSLogGroup
               awslogs-region: !Sub ${Region}
               awslogs-stream-prefix: ecs
+
+  # Application Load Balancer
+  OrchFrontendAlb:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-alb
+      Subnets:
+        - subnet-0027e271c35f828c1
+        - subnet-01b7b1c835828eb3d
+        - subnet-0b648700a8ac43736
+      SecurityGroups:
+        - !Ref OrchFrontendAlbSecurityGroup
+
+  OrchFrontendAlbTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-alb-tg
+      Port: 3000
+      Protocol: HTTP
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "traffic-port"
+      HealthCheckPath: "/health"
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+
+  OrchFrontendAlbListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OrchFrontendAlbTargetGroup
+      LoadBalancerArn: !Ref OrchFrontendAlb
+      Port: 80
+      Protocol: HTTP
+
+  # Network Load Balancer
+  OrchFrontendNlb:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-nlb
+      Type: network
+      Subnets:
+        - subnet-0027e271c35f828c1
+        - subnet-01b7b1c835828eb3d
+        - subnet-0b648700a8ac43736
+      SecurityGroups:
+        - !Ref OrchFrontendNlbSecurityGroup
+
+  OrchFrontendNlbTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-nlb-tg
+      Port: 80
+      Protocol: TCP
+      VpcId: vpc-0b6f4a5d72f84ed0c
+      TargetType: alb
+      Targets:
+        - Id: !Ref OrchFrontendAlb
+      TargetType: alb
+      HealthCheckPort: "traffic-port"
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+
+  OrchFrontendNlbListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OrchFrontendNlbTargetGroup
+      LoadBalancerArn: !Ref OrchFrontendNlb
+      Port: 80
+      Protocol: TCP
+
+  # Security Groups and Ingress / Egress rules
+  OrchFrontendECSTaskSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for ECS Tasks"
+      VpcId: vpc-0b6f4a5d72f84ed0c
+
+  OrchFrontendECSTaskSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 3000
+      ToPort: 3000
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+  
+  OrchFrontendECSTaskSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 0
+      ToPort: 65535
+      CidrIp: "0.0.0.0/0"
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+
+  OrchFrontendAlbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for OrchFrontendAlb"
+      VpcId: vpc-0b6f4a5d72f84ed0c
+
+  OrchFrontendAlbSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+  
+  OrchFrontendAlbSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 3000
+      ToPort: 3000
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+
+  OrchFrontendNlbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for OrchFrontendNlb"
+      VpcId: vpc-0b6f4a5d72f84ed0c
+
+  OrchFrontendNlbSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 80
+      ToPort: 80
+      CidrIp: "0.0.0.0/0"
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+
+  OrchFrontendNlbSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 80
+      ToPort: 80
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+
+Outputs:
+  # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
+  OrchFrontendNlbDnsName:
+    Description: The DNS Name of the Orchestration Frontend NLB
+    Value: !GetAtt OrchFrontendNlb.DNSName
+
+  OrchFrontendNlbArn:
+    Description: The ARN of the Orchestration Frontend NLB
+    Value: !Ref OrchFrontendNlb
+
