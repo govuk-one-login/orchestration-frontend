@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "build"
+  },
+  {
+    "ParameterKey": "OneLoginRepositoryName",
+    "ParameterValue": "orchestration-frontend"
+  },
+  {
+    "ParameterKey": "IncludePromotion",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "RequireManualApproval",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "SAMStackName",
+    "ParameterValue": "build-orch-f-deploy"
+  },
+  {
+    "ParameterKey": "SigningProfileArn",
+    "ParameterValue": "arn:aws:signer:eu-west-2:519368372183:/signing-profiles/SigningProfile_d63POiCvRt0m"
+  },
+  {
+    "ParameterKey": "SigningProfileVersionArn",
+    "ParameterValue": "arn:aws:signer:eu-west-2:519368372183:/signing-profiles/SigningProfile_d63POiCvRt0m/Xgu7Dqs3Eq"
+  }
+]

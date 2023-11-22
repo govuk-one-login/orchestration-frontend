@@ -1,22 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    PermissionsBoundary: !If
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
+
 Parameters:
-  Environment:
+  Enviroment:
     Type: String
   AWSAccount:
     Type: String
   Region:
     Type: String
+  PermissionsBoundary:
+    Type: String
+    Description: The ARN of the permissions boundary to apply when creating IAM roles
+    Default: none
+
+Conditions:
+  UsePermissionsBoundary:
+    !Not [ !Equals [ none, !Ref PermissionsBoundary ] ]
 
 Resources:
   # ECS
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
-      ClusterName: !Sub ${Environment}-orch-app-cluster
+      ClusterName: !Sub ${Enviroment}-orch-app-cluster
 
   OrchECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/${Environment}-orch-frontend
+      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -30,12 +48,16 @@ Resources:
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
 
   OrchFrontendECSService:
     DependsOn: OrchFrontendAlbListener
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
+      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
       Cluster: !Ref OrchECSCluster
       TaskDefinition: !Ref OrchFrontendTaskDefinition
       DesiredCount: 1
@@ -57,7 +79,7 @@ Resources:
   OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${Environment}-orch-frontend-ecs-task-definition
+      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
