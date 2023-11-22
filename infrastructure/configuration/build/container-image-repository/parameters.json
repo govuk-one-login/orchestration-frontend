@@ -1,4 +1,5 @@
-[ {
+[
+  {
     "ParameterKey": "PipelineStackName",
     "ParameterValue": "build-orch-f-pipeline"
   }

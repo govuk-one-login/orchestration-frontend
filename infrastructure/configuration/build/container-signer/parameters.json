@@ -1,10 +1,10 @@
 [
-    {
-      "ParameterKey": "Environment",
-      "ParameterValue": "build"
-    },
-    {
-      "ParameterKey": "AllowedAccounts",
-      "ParameterValue": ""
-    }
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "build"
+  },
+  {
+    "ParameterKey": "AllowedAccounts",
+    "ParameterValue": ""
+  }
 ]

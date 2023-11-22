@@ -1,30 +1,30 @@
 [
-    {
-      "ParameterKey": "Environment",
-      "ParameterValue": "dev"
-    },
-    {
-      "ParameterKey": "OneLoginRepositoryName",
-      "ParameterValue": "orchestration-frontend"
-    },
-    {
-      "ParameterKey": "IncludePromotion",
-      "ParameterValue": "No"
-    },
-    {
-      "ParameterKey": "RequireManualApproval",
-      "ParameterValue": "No"
-    },
-    {
-      "ParameterKey": "SAMStackName",
-      "ParameterValue": "dev-orch-f-deploy"
-    },
-    {
-      "ParameterKey": "SigningProfileArn",
-      "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY"
-    },
-    {
-      "ParameterKey": "SigningProfileVersionArn",
-      "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY/hsozMWacYH"
-    }
-  ]
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "dev"
+  },
+  {
+    "ParameterKey": "OneLoginRepositoryName",
+    "ParameterValue": "orchestration-frontend"
+  },
+  {
+    "ParameterKey": "IncludePromotion",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "RequireManualApproval",
+    "ParameterValue": "No"
+  },
+  {
+    "ParameterKey": "SAMStackName",
+    "ParameterValue": "dev-orch-f-deploy"
+  },
+  {
+    "ParameterKey": "SigningProfileArn",
+    "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY"
+  },
+  {
+    "ParameterKey": "SigningProfileVersionArn",
+    "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY/hsozMWacYH"
+  }
+]
