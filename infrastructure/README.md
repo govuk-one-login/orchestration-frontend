@@ -8,7 +8,6 @@ To run this tool you will need the below CLI's
 
 * aws cli for management of Cloudformation stacks
 * jq for formatting and conversion
-* aws sso for authentication
 
 ## How to use
 
