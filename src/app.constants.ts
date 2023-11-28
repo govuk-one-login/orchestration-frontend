@@ -3,6 +3,11 @@ export enum LOCALE {
   CY = "cy",
 }
 
+export const API_ENDPOINTS = {
+  AUTH_CODE: "/auth-code",
+  IDENTITY_PROGRESS: "/identity-progress",
+};
+
 export const HTTP_STATUS_CODES = {
   OK: 200,
   BAD_REQUEST: 400,
