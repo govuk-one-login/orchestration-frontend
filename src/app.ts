@@ -15,6 +15,7 @@ import { errorPageGet } from "./components/errors/error-controller";
 import { PATH_NAMES } from "./app.constants";
 import { permanentlyLockedController } from "./components/permanently-locked/permanently-locked-controller";
 import { suspendedPageController } from "./components/suspended-page/suspended-page-controller";
+import { loggerMiddleware } from "./utils/logger";
 
 const APP_VIEWS = [
   path.join(__dirname, "components"),
@@ -23,19 +24,22 @@ const APP_VIEWS = [
 
 async function createApp(): Promise<express.Application> {
   const app: express.Application = express();
+  const router = express.Router();
+  app.use("/orch-frontend", router);
 
-  app.get("/health", (req, res) => {
+  router.get("/health", (req, res) => {
     res.status(200).send("OK");
   });
 
-  app.use(noCacheMiddleware);
+  router.use(noCacheMiddleware);
+  router.use(loggerMiddleware);
 
-  app.use(
+  router.use(
     "/assets",
     express.static(path.resolve("node_modules/govuk-frontend/govuk/assets"))
   );
 
-  app.use("/public", express.static(path.join(__dirname, "public")));
+  router.use("/public", express.static(path.join(__dirname, "public")));
   app.set("view engine", configureNunjucks(app, APP_VIEWS));
 
   await i18next
@@ -46,18 +50,18 @@ async function createApp(): Promise<express.Application> {
         path.join(__dirname, "locales/{{lng}}/{{ns}}.json")
       )
     );
-  app.use(i18nextMiddleware.handle(i18next));
+  router.use(i18nextMiddleware.handle(i18next));
 
-  app.use(cookieParser());
+  router.use(cookieParser());
 
-  app.use(getSessionIdMiddleware);
+  router.use(getSessionIdMiddleware);
 
-  app.use(proveIdentityCallbackRouter);
-  app.get(PATH_NAMES.NOT_AVAILABLE, permanentlyLockedController);
-  app.get(PATH_NAMES.UNAVAILABLE, suspendedPageController);
-  app.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
-  app.use(serverErrorHandler);
-  app.use(pageNotFoundHandler);
+  router.use(proveIdentityCallbackRouter);
+  router.get(PATH_NAMES.NOT_AVAILABLE, permanentlyLockedController);
+  router.get(PATH_NAMES.UNAVAILABLE, suspendedPageController);
+  router.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
+  router.use(serverErrorHandler);
+  router.use(pageNotFoundHandler);
 
   return app;
 }

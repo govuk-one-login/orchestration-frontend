@@ -31,5 +31,5 @@ export function validateSessionMiddleware(
   }
 
   res.status(HTTP_STATUS_CODES.UNAUTHORIZED);
-  res.redirect("/error");
+  res.redirect("/orch-frontend/error");
 }
