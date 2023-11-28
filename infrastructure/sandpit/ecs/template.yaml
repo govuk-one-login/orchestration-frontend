@@ -9,7 +9,7 @@ Globals:
       - !Ref AWS::NoValue
 
 Parameters:
-  Enviroment:
+  Environment:
     Type: String
   AWSAccount:
     Type: String
@@ -29,12 +29,12 @@ Resources:
   OrchECSCluster:
     Type: "AWS::ECS::Cluster"
     Properties:
-      ClusterName: !Sub ${Enviroment}-orch-app-cluster
+      ClusterName: !Sub ${Environment}-orch-app-cluster
 
   OrchECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /ecs/${Enviroment}-orch-frontend
+      LogGroupName: !Sub /ecs/${Environment}-orch-frontend
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -57,7 +57,7 @@ Resources:
     DependsOn: OrchFrontendAlbListener
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: !Sub ${Enviroment}-orch-frontend-ecs-service
+      ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
       Cluster: !Ref OrchECSCluster
       TaskDefinition: !Ref OrchFrontendTaskDefinition
       DesiredCount: 1
@@ -79,7 +79,7 @@ Resources:
   OrchFrontendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub ${Enviroment}-orch-frontend-ecs-task-definition
+      Family: !Sub ${Environment}-orch-frontend-ecs-task-definition
       Cpu: 256
       Memory: 0.5GB
       NetworkMode: awsvpc
