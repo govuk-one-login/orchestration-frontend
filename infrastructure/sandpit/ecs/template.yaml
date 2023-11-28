@@ -23,6 +23,23 @@ Parameters:
 Conditions:
   UsePermissionsBoundary:
     !Not [ !Equals [ none, !Ref PermissionsBoundary ] ]
+  IsProd:
+    !Equals [ production, !Ref Environment ]
+
+Mappings:
+  EnvironmentConfiguration:
+    sandpit:
+      vpcId: vpc-0b6f4a5d72f84ed0c
+    dev:
+      vpcId: vpc-024506f732c8d477f
+    build:
+      vpcId: vpc-03db44fa71b8d00b2
+    staging:
+      vpcId: vpc-0ca40c7d13490419d
+    integration:
+      vpcId: vpc-04444d1dc96d8822c
+    production:
+      vpcId: vpc-00012e96e1cd0bf95
 
 Resources:
   # ECS
@@ -36,6 +53,19 @@ Resources:
     Properties:
       LogGroupName: !Sub /ecs/${Environment}-orch-frontend
 
+
+  OrchFrontendECSSecretsManagerAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${Environment}-orch-frontend-ecs-secrets-manager-access-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: !Sub arn:aws:secretsmanager:${Region}:${AWSAccount}:secret:/${Environment}/frontend-api-key*
+
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -48,6 +78,7 @@ Resources:
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        - !Ref OrchFrontendECSSecretsManagerAccessManagedPolicy
       PermissionsBoundary: !If
         - UsePermissionsBoundary
         - !Ref PermissionsBoundary
@@ -71,6 +102,7 @@ Resources:
             - subnet-0b648700a8ac43736
           SecurityGroups:
             - !Ref OrchFrontendECSTaskSecurityGroup
+            - !Ref OrchFrontendAllowEgressSecurityGroup
       LoadBalancers:
         - ContainerName: sandpit-orch-frontend-image
           ContainerPort: 3000
@@ -97,6 +129,15 @@ Resources:
               awslogs-group: !Ref OrchECSLogGroup
               awslogs-region: !Sub ${Region}
               awslogs-stream-prefix: ecs
+          Environment:
+            - Name: API_BASE_URL
+              Value: !If
+                - IsProd
+                - https://auth.account.gov.uk
+                - !Sub https://auth.${Environment}.account.gov.uk
+          Secrets:
+            - Name: API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${Region}:${AWSAccount}:secret:/${Environment}/frontend-api-key
 
   # Application Load Balancer
   OrchFrontendAlb:
@@ -120,7 +161,7 @@ Resources:
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
-      HealthCheckPath: "/health"
+      HealthCheckPath: "/orch-frontend/health"
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
@@ -157,7 +198,6 @@ Resources:
       Port: 80
       Protocol: TCP
       VpcId: vpc-0b6f4a5d72f84ed0c
-      TargetType: alb
       Targets:
         - Id: !Ref OrchFrontendAlb
       TargetType: alb
@@ -278,6 +318,19 @@ Resources:
         Fn::GetAtt:
           - OrchFrontendNlbSecurityGroup
           - GroupId
+
+  OrchFrontendAllowEgressSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow egress to external services
+      GroupName: !Sub ${Environment}-orch-frontend-allow-egress
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          Description: Allow outbound HTTPS traffic to Internet
+          FromPort: 443
+          IpProtocol: tcp
+          ToPort: 443
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
 Outputs:
   # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
