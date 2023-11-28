@@ -5,3 +5,7 @@ export function getServiceDomain(): string {
 export function supportLanguageCY(): boolean {
   return process.env.SUPPORT_LANGUAGE_CY === "1";
 }
+
+export function getLogLevel(): string {
+  return process.env.LOGS_LEVEL || "debug";
+}
