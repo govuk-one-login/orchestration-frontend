@@ -3,7 +3,7 @@ import PinoHttp from "pino-http";
 import { getLogLevel } from "../config";
 
 const logger = pino({
-  name: "di-auth",
+  name: "di-orch",
   level: getLogLevel(),
   serializers: {
     req: (req) => {
@@ -44,16 +44,17 @@ const loggerMiddleware = PinoHttp({
   wrapSerializers: false,
   autoLogging: {
     ignorePaths: [
-      "/public/scripts/cookies.js",
-      "/public/scripts/all.js",
-      "/public/style.css",
-      "/public/scripts",
-      "/public/scripts/application.js",
-      "/assets/images/govuk-crest-2x.png",
-      "/assets/fonts/bold-b542beb274-v2.woff2",
-      "/assets/fonts/bold-b542beb274-v2.woff2",
-      "/assets/images/favicon.ico",
-      "/assets/fonts/light-94a07e06a1-v2.woff2",
+      "/orch-frontend/public/scripts/cookies.js",
+      "/orch-frontend/public/scripts/all.js",
+      "/orch-frontend/public/style.css",
+      "/orch-frontend/public/scripts",
+      "/orch-frontend/public/scripts/application.js",
+      "/orch-frontend/assets/images/govuk-crest-2x.png",
+      "/orch-frontend/assets/fonts/bold-b542beb274-v2.woff2",
+      "/orch-frontend/assets/fonts/bold-b542beb274-v2.woff2",
+      "/orch-frontend/assets/images/favicon.ico",
+      "/orch-frontend/assets/fonts/light-94a07e06a1-v2.woff2",
+      "/orch-frontend/health",
     ],
   },
   customErrorMessage: function (error, res) {

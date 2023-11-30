@@ -3,7 +3,8 @@ import { ApiResponseResult, DefaultApiResponse } from "../../types";
 export interface ProveIdentityCallbackServiceInterface {
   getIdentityProgress: (
     sessionId: string,
-    clientSessionId: string
+    clientSessionId: string,
+    persistentSessionId: string
   ) => Promise<ApiResponseResult<IdentityProgressResponse>>;
   getAuthCodeRedirectUri: (
     sessionId: string,
@@ -24,6 +25,7 @@ export enum IdentityProgressStatus {
   COMPLETED = "COMPLETED",
   ERROR = "ERROR",
   PROCESSING = "PROCESSING",
+  NO_ENTRY = "NO_ENTRY",
 }
 
 export interface AuthCodeResponse extends DefaultApiResponse {

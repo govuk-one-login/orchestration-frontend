@@ -17,13 +17,15 @@ export function proveIdentityCallbackService(
 ): ProveIdentityCallbackServiceInterface {
   const getIdentityProgress = async function (
     sessionId: string,
-    clientSessionId: string
+    clientSessionId: string,
+    persistentSessionId: string
   ): Promise<ApiResponseResult<IdentityProgressResponse>> {
     const response = await axios.client.get<IdentityProgressResponse>(
       API_ENDPOINTS.IDENTITY_PROGRESS,
       getRequestConfig({
-        sessionId: sessionId,
-        clientSessionId: clientSessionId,
+        sessionId,
+        clientSessionId,
+        persistentSessionId,
       })
     );
     return createApiResponse<IdentityProgressResponse>(response);
@@ -35,10 +37,10 @@ export function proveIdentityCallbackService(
     persistentSessionId: string
   ): Promise<ApiResponseResult<AuthCodeResponse>> {
     const config = getRequestConfig({
-      sessionId: sessionId,
-      clientSessionId: clientSessionId,
-      sourceIp: sourceIp,
-      persistentSessionId: persistentSessionId,
+      sessionId,
+      clientSessionId,
+      sourceIp,
+      persistentSessionId,
     });
     const response = await axios.client.get<AuthCodeResponse>(
       API_ENDPOINTS.AUTH_CODE,

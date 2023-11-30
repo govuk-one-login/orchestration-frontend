@@ -92,6 +92,27 @@ describe("prove identity callback controller", () => {
         )}&state=${encodeURIComponent("testState")}`
       );
     });
+
+    it("should redirect to error page when not on identity flow", async () => {
+      const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
+        getIdentityProgress: sinon.fake.returns(
+          mockGetIdentityProgress(IdentityProgressStatus.NO_ENTRY)
+        ),
+      } as unknown as ProveIdentityCallbackServiceInterface;
+
+      await proveIdentityCallbackGet(fakeProveIdentityService)(
+        req as Request,
+        res as Response
+      );
+
+      expect(res.redirect).to.have.been.calledWith(
+        `http://someservice.com/auth?error=${
+          OIDC_ERRORS.ACCESS_DENIED
+        }&error_description=${encodeURIComponent(
+          IPV_ERROR_CODES.IDENTITY_PROCESSING_TIMEOUT
+        )}&state=${encodeURIComponent("testState")}`
+      );
+    });
   });
 
   function mockGetAuthCodeRedirectUri(): ApiResponseResult<AuthCodeResponse> {

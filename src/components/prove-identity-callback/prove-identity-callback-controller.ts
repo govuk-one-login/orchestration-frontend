@@ -16,7 +16,8 @@ export function proveIdentityCallbackGet(
 
     const response = await service.getIdentityProgress(
       sessionId,
-      clientSessionId
+      clientSessionId,
+      persistentSessionId
     );
     if (response.data.status === IdentityProgressStatus.PROCESSING) {
       return res.render("prove-identity-callback/index.njk", {

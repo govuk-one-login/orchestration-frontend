@@ -102,7 +102,6 @@ Resources:
             - subnet-0b648700a8ac43736
           SecurityGroups:
             - !Ref OrchFrontendECSTaskSecurityGroup
-            - !Ref OrchFrontendAllowEgressSecurityGroup
       LoadBalancers:
         - ContainerName: sandpit-orch-frontend-image
           ContainerPort: 3000
@@ -157,7 +156,7 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-alb-tg
       Port: 3000
       Protocol: HTTP
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
@@ -197,7 +196,7 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-nlb-tg
       Port: 80
       Protocol: TCP
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
       Targets:
         - Id: !Ref OrchFrontendAlb
       TargetType: alb
@@ -221,7 +220,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for ECS Tasks"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
   OrchFrontendECSTaskSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -241,10 +240,11 @@ Resources:
   OrchFrontendECSTaskSecurityGroupEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      IpProtocol: "-1"
-      FromPort: 0
-      ToPort: 65535
-      CidrIp: "0.0.0.0/0"
+      CidrIp: 0.0.0.0/0
+      Description: Allow outbound HTTPS traffic to Internet
+      FromPort: 443
+      IpProtocol: tcp
+      ToPort: 443
       GroupId:
         Fn::GetAtt:
           - OrchFrontendECSTaskSecurityGroup
@@ -254,7 +254,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendAlb"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
   OrchFrontendAlbSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -290,7 +290,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendNlb"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
   OrchFrontendNlbSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -318,19 +318,6 @@ Resources:
         Fn::GetAtt:
           - OrchFrontendNlbSecurityGroup
           - GroupId
-
-  OrchFrontendAllowEgressSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow egress to external services
-      GroupName: !Sub ${Environment}-orch-frontend-allow-egress
-      SecurityGroupEgress:
-        - CidrIp: 0.0.0.0/0
-          Description: Allow outbound HTTPS traffic to Internet
-          FromPort: 443
-          IpProtocol: tcp
-          ToPort: 443
-      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
 Outputs:
   # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
