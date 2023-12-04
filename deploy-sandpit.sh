@@ -20,4 +20,6 @@ echo ${parameters}
 echo "Deploying ECS"
 sam build
 sam deploy --stack-name sandpit-orch-frontend --template-file template.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
+echo "Updating service"
+aws ecs update-service --cluster sandpit-orch-app-cluster --service sandpit-orch-frontend-ecs-service --force-new-deployment --no-cli-pager
 popd
