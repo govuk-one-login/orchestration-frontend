@@ -119,7 +119,7 @@ Resources:
       ExecutionRoleArn: !GetAtt OrchFrontendECSExecutionRole.Arn
       ContainerDefinitions:
         - Name: sandpit-orch-frontend-image
-          Image: !Sub ${AWSAccount}.dkr.ecr.${Region}.amazonaws.com/sandpit-orch-frontend-image-repository:latest
+          Image: CONTAINER-IMAGE-PLACEHOLDER
           PortMappings:
             - ContainerPort: 3000
           LogConfiguration:
