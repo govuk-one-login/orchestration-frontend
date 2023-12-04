@@ -19,5 +19,5 @@ pushd "./infrastructure/sandpit/ecs"
 echo ${parameters}
 echo "Deploying ECS"
 sam build
-sam deploy --stack-name sandpit-orch-frontend --template-file template.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM
+sam deploy --stack-name sandpit-orch-frontend --template-file template.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
 popd

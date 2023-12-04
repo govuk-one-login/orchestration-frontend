@@ -23,6 +23,23 @@ Parameters:
 Conditions:
   UsePermissionsBoundary:
     !Not [ !Equals [ none, !Ref PermissionsBoundary ] ]
+  IsProd:
+    !Equals [ production, !Ref Environment ]
+
+Mappings:
+  EnvironmentConfiguration:
+    sandpit:
+      vpcId: vpc-0b6f4a5d72f84ed0c
+    dev:
+      vpcId: vpc-024506f732c8d477f
+    build:
+      vpcId: vpc-03db44fa71b8d00b2
+    staging:
+      vpcId: vpc-0ca40c7d13490419d
+    integration:
+      vpcId: vpc-04444d1dc96d8822c
+    production:
+      vpcId: vpc-00012e96e1cd0bf95
 
 Resources:
   # ECS
@@ -36,6 +53,19 @@ Resources:
     Properties:
       LogGroupName: !Sub /ecs/${Environment}-orch-frontend
 
+
+  OrchFrontendECSSecretsManagerAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${Environment}-orch-frontend-ecs-secrets-manager-access-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: !Sub arn:aws:secretsmanager:${Region}:${AWSAccount}:secret:/${Environment}/frontend-api-key*
+
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -48,6 +78,7 @@ Resources:
             Action: "sts:AssumeRole"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        - !Ref OrchFrontendECSSecretsManagerAccessManagedPolicy
       PermissionsBoundary: !If
         - UsePermissionsBoundary
         - !Ref PermissionsBoundary
@@ -97,6 +128,15 @@ Resources:
               awslogs-group: !Ref OrchECSLogGroup
               awslogs-region: !Sub ${Region}
               awslogs-stream-prefix: ecs
+          Environment:
+            - Name: API_BASE_URL
+              Value: !If
+                - IsProd
+                - https://auth.account.gov.uk
+                - !Sub https://auth.${Environment}.account.gov.uk
+          Secrets:
+            - Name: API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${Region}:${AWSAccount}:secret:/${Environment}/frontend-api-key
 
   # Application Load Balancer
   OrchFrontendAlb:
@@ -116,11 +156,11 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-alb-tg
       Port: 3000
       Protocol: HTTP
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
-      HealthCheckPath: "/health"
+      HealthCheckPath: "/orch-frontend/health"
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
@@ -156,8 +196,7 @@ Resources:
       Name: !Sub ${Environment}-orch-frontend-nlb-tg
       Port: 80
       Protocol: TCP
-      VpcId: vpc-0b6f4a5d72f84ed0c
-      TargetType: alb
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
       Targets:
         - Id: !Ref OrchFrontendAlb
       TargetType: alb
@@ -181,7 +220,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for ECS Tasks"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
   OrchFrontendECSTaskSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -201,10 +240,11 @@ Resources:
   OrchFrontendECSTaskSecurityGroupEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
-      IpProtocol: "-1"
-      FromPort: 0
-      ToPort: 65535
-      CidrIp: "0.0.0.0/0"
+      CidrIp: 0.0.0.0/0
+      Description: Allow outbound HTTPS traffic to Internet
+      FromPort: 443
+      IpProtocol: tcp
+      ToPort: 443
       GroupId:
         Fn::GetAtt:
           - OrchFrontendECSTaskSecurityGroup
@@ -214,7 +254,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendAlb"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
   OrchFrontendAlbSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -250,7 +290,7 @@ Resources:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
       GroupDescription: "Security group for OrchFrontendNlb"
-      VpcId: vpc-0b6f4a5d72f84ed0c
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
 
   OrchFrontendNlbSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress

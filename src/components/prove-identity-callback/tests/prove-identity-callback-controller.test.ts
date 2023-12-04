@@ -16,9 +16,10 @@ import {
   proveIdentityCallbackSessionExpiryError,
 } from "../prove-identity-callback-controller";
 import {
-  IdentityProcessingStatus,
-  ProcessIdentityResponse,
+  IdentityProgressStatus,
+  IdentityProgressResponse,
   ProveIdentityCallbackServiceInterface,
+  AuthCodeResponse,
 } from "../types";
 import { ApiResponseResult } from "../../../types";
 
@@ -33,8 +34,11 @@ describe("prove identity callback controller", () => {
   describe("proveIdentityCallbackGet", () => {
     it("should redirect to auth code when identity processing complete", async () => {
       const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
-        processIdentity: sinon.fake.returns(
-          mockProcessIdentity(IdentityProcessingStatus.COMPLETED)
+        getIdentityProgress: sinon.fake.returns(
+          mockGetIdentityProgress(IdentityProgressStatus.COMPLETED)
+        ),
+        getAuthCodeRedirectUri: sinon.fake.returns(
+          mockGetAuthCodeRedirectUri()
         ),
       } as unknown as ProveIdentityCallbackServiceInterface;
 
@@ -43,6 +47,9 @@ describe("prove identity callback controller", () => {
         res as Response
       );
 
+      expect(fakeProveIdentityService.getAuthCodeRedirectUri).to.have.been
+        .called;
+
       expect(res.redirect).to.have.been.calledWith(
         "https://mock-successful-redirect.gov.uk"
       );
@@ -50,8 +57,8 @@ describe("prove identity callback controller", () => {
 
     it("should render index when identity is being processed ", async () => {
       const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
-        processIdentity: sinon.fake.returns(
-          mockProcessIdentity(IdentityProcessingStatus.PROCESSING)
+        getIdentityProgress: sinon.fake.returns(
+          mockGetIdentityProgress(IdentityProgressStatus.PROCESSING)
         ),
       } as unknown as ProveIdentityCallbackServiceInterface;
 
@@ -67,8 +74,29 @@ describe("prove identity callback controller", () => {
 
     it("should redirect to error page when identity processing has errored", async () => {
       const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
-        processIdentity: sinon.fake.returns(
-          mockProcessIdentity(IdentityProcessingStatus.ERROR)
+        getIdentityProgress: sinon.fake.returns(
+          mockGetIdentityProgress(IdentityProgressStatus.ERROR)
+        ),
+      } as unknown as ProveIdentityCallbackServiceInterface;
+
+      await proveIdentityCallbackGet(fakeProveIdentityService)(
+        req as Request,
+        res as Response
+      );
+
+      expect(res.redirect).to.have.been.calledWith(
+        `http://someservice.com/auth?error=${
+          OIDC_ERRORS.ACCESS_DENIED
+        }&error_description=${encodeURIComponent(
+          IPV_ERROR_CODES.IDENTITY_PROCESSING_TIMEOUT
+        )}&state=${encodeURIComponent("testState")}`
+      );
+    });
+
+    it("should redirect to error page when not on identity flow", async () => {
+      const fakeProveIdentityService: ProveIdentityCallbackServiceInterface = {
+        getIdentityProgress: sinon.fake.returns(
+          mockGetIdentityProgress(IdentityProgressStatus.NO_ENTRY)
         ),
       } as unknown as ProveIdentityCallbackServiceInterface;
 
@@ -87,9 +115,19 @@ describe("prove identity callback controller", () => {
     });
   });
 
-  function mockProcessIdentity(
-    status: IdentityProcessingStatus
-  ): ApiResponseResult<ProcessIdentityResponse> {
+  function mockGetAuthCodeRedirectUri(): ApiResponseResult<AuthCodeResponse> {
+    return {
+      data: {
+        message: "test",
+        code: -1,
+        location: "https://mock-successful-redirect.gov.uk",
+      },
+      success: true,
+    };
+  }
+  function mockGetIdentityProgress(
+    status: IdentityProgressStatus
+  ): ApiResponseResult<IdentityProgressResponse> {
     return {
       data: {
         message: "test",

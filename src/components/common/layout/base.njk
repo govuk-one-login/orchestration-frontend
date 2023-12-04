@@ -3,10 +3,11 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
+{% set assetPath="/orch-frontend/assets" %}
 {% block head %}
 
   <!--[if !IE 8]><!-->
-    <link href="/public/style.css" rel="stylesheet">
+    <link href="/orch-frontend/public/style.css" rel="stylesheet">
   <!--<![endif]-->
 
   {# For Internet Explorer 8, you need to compile specific stylesheet #}
@@ -113,8 +114,8 @@
 
 {% block bodyEnd %}
     {% block scripts %}{% endblock %}
-  <script type="text/javascript" src="/public/scripts/cookies.js"></script>
-  <script type="text/javascript"  src="/public/scripts/application.js"></script>
-  <script type="text/javascript"  src="/public/scripts/all.js"></script>
+  <script type="text/javascript" src="/orch-frontend/public/scripts/cookies.js"></script>
+  <script type="text/javascript"  src="/orch-frontend/public/scripts/application.js"></script>
+  <script type="text/javascript"  src="/orch-frontend/public/scripts/all.js"></script>
   <script type="text/javascript" nonce='{{scriptNonce}}'>window.GOVSignIn.appInit("{{gtmId}}", "{{ analyticsCookieDomain }}")</script>
 {% endblock %}

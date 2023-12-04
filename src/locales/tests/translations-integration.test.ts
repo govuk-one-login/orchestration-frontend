@@ -63,7 +63,7 @@ describe("translations", () => {
     (done: Mocha.Done, value: any) => {
       createApp().then((app) => {
         request(app)
-          .get(`/${value.path}`)
+          .get(`/orch-frontend/${value.path}`)
           .set("Cookie", `lng=${value.cookie};`)
           .expect(new RegExp(value.expectedTitle))
           .expect(new RegExp(value.expectedParagraphContent))
