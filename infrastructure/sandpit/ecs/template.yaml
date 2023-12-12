@@ -11,10 +11,14 @@ Globals:
 Parameters:
   Environment:
     Type: String
-  AWSAccount:
+    Description: The name of the environment to deploy to
+  VpcStackName:
     Type: String
-  Region:
+    Description: The name of the stack used to create the VPC
+  CodeSigningConfigArn:
     Type: String
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Default: none
   PermissionsBoundary:
     Type: String
     Description: The ARN of the permissions boundary to apply when creating IAM roles
@@ -34,6 +38,10 @@ Mappings:
       vpcId: vpc-024506f732c8d477f
     build:
       vpcId: vpc-03db44fa71b8d00b2
+      subnetIds: 
+       - subnet-06431beae9b136e15
+       - subnet-016db45a259212743
+       - subnet-0f595928b921f038a
     staging:
       vpcId: vpc-0ca40c7d13490419d
     integration:
@@ -64,7 +72,7 @@ Resources:
           - Effect: Allow
             Action:
               - secretsmanager:GetSecretValue
-            Resource: !Sub arn:aws:secretsmanager:${Region}:${AWSAccount}:secret:/${Environment}/frontend-api-key*
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key*
 
   OrchFrontendECSExecutionRole:
     Type: "AWS::IAM::Role"
@@ -96,10 +104,7 @@ Resources:
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
-          Subnets:
-            - subnet-0027e271c35f828c1
-            - subnet-01b7b1c835828eb3d
-            - subnet-0b648700a8ac43736
+          Subnets: !FindInMap [ EnvironmentConfiguration, !Ref Environment, subnetIds ]
           SecurityGroups:
             - !Ref OrchFrontendECSTaskSecurityGroup
       LoadBalancers:
@@ -126,7 +131,7 @@ Resources:
             LogDriver: awslogs
             Options:
               awslogs-group: !Ref OrchECSLogGroup
-              awslogs-region: !Sub ${Region}
+              awslogs-region: !Sub ${AWS::Region}
               awslogs-stream-prefix: ecs
           Environment:
             - Name: API_BASE_URL
@@ -136,17 +141,14 @@ Resources:
                 - !Sub https://auth.${Environment}.account.gov.uk
           Secrets:
             - Name: API_KEY
-              ValueFrom: !Sub arn:aws:secretsmanager:${Region}:${AWSAccount}:secret:/${Environment}/frontend-api-key
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key
 
   # Application Load Balancer
   OrchFrontendAlb:
     Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
     Properties:
       Name: !Sub ${Environment}-orch-frontend-alb
-      Subnets:
-        - subnet-0027e271c35f828c1
-        - subnet-01b7b1c835828eb3d
-        - subnet-0b648700a8ac43736
+      Subnets: !FindInMap [ EnvironmentConfiguration, !Ref Environment, subnetIds ]
       SecurityGroups:
         - !Ref OrchFrontendAlbSecurityGroup
 
@@ -183,10 +185,7 @@ Resources:
     Properties:
       Name: !Sub ${Environment}-orch-frontend-nlb
       Type: network
-      Subnets:
-        - subnet-0027e271c35f828c1
-        - subnet-01b7b1c835828eb3d
-        - subnet-0b648700a8ac43736
+      Subnets: !FindInMap [ EnvironmentConfiguration, !Ref Environment, subnetIds ]
       SecurityGroups:
         - !Ref OrchFrontendNlbSecurityGroup
 
