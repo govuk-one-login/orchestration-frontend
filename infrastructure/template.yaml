@@ -1,0 +1,330 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    PermissionsBoundary: !If
+      - UsePermissionsBoundary
+      - !Ref PermissionsBoundary
+      - !Ref AWS::NoValue
+
+Parameters:
+  Environment:
+    Type: String
+    Description: The name of the environment to deploy to
+  VpcStackName:
+    Type: String
+    Description: The name of the stack used to create the VPC
+  CodeSigningConfigArn:
+    Type: String
+    Description: The ARN of the Code Signing Config to use, provided by the deployment pipeline
+    Default: none
+  PermissionsBoundary:
+    Type: String
+    Description: The ARN of the permissions boundary to apply when creating IAM roles
+    Default: none
+
+Conditions:
+  UsePermissionsBoundary:
+    !Not [ !Equals [ none, !Ref PermissionsBoundary ] ]
+  IsProd:
+    !Equals [ production, !Ref Environment ]
+
+Mappings:
+  EnvironmentConfiguration:
+    sandpit:
+      vpcId: vpc-0b6f4a5d72f84ed0c
+    dev:
+      vpcId: vpc-024506f732c8d477f
+    build:
+      vpcId: vpc-03db44fa71b8d00b2
+      subnetIds: 
+       - subnet-06431beae9b136e15
+       - subnet-016db45a259212743
+       - subnet-0f595928b921f038a
+    staging:
+      vpcId: vpc-0ca40c7d13490419d
+    integration:
+      vpcId: vpc-04444d1dc96d8822c
+    production:
+      vpcId: vpc-00012e96e1cd0bf95
+
+Resources:
+  # ECS
+  OrchECSCluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: !Sub ${Environment}-orch-app-cluster
+
+  OrchECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${Environment}-orch-frontend
+
+
+  OrchFrontendECSSecretsManagerAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub ${Environment}-orch-frontend-ecs-secrets-manager-access-policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+            Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key*
+
+  OrchFrontendECSExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "ecs-tasks.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        - !Ref OrchFrontendECSSecretsManagerAccessManagedPolicy
+      PermissionsBoundary: !If
+        - UsePermissionsBoundary
+        - !Ref PermissionsBoundary
+        - !Ref AWS::NoValue
+
+  OrchFrontendECSService:
+    DependsOn: OrchFrontendAlbListener
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub ${Environment}-orch-frontend-ecs-service
+      Cluster: !Ref OrchECSCluster
+      TaskDefinition: !Ref OrchFrontendTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: !FindInMap [ EnvironmentConfiguration, !Ref Environment, subnetIds ]
+          SecurityGroups:
+            - !Ref OrchFrontendECSTaskSecurityGroup
+      LoadBalancers:
+        - ContainerName: !Sub ${Environment}-orch-frontend-image
+          ContainerPort: 3000
+          TargetGroupArn: !Ref OrchFrontendAlbTargetGroup
+
+  OrchFrontendTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${Environment}-orch-frontend-ecs-task-definition
+      Cpu: 256
+      Memory: 0.5GB
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !GetAtt OrchFrontendECSExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: !Sub ${Environment}-orch-frontend-image
+          Image: CONTAINER-IMAGE-PLACEHOLDER
+          PortMappings:
+            - ContainerPort: 3000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref OrchECSLogGroup
+              awslogs-region: !Sub ${AWS::Region}
+              awslogs-stream-prefix: ecs
+          Environment:
+            - Name: API_BASE_URL
+              Value: !If
+                - IsProd
+                - https://auth.account.gov.uk
+                - !Sub https://auth.${Environment}.account.gov.uk
+          Secrets:
+            - Name: API_KEY
+              ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key
+
+  # Application Load Balancer
+  OrchFrontendAlb:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-alb
+      Subnets: !FindInMap [ EnvironmentConfiguration, !Ref Environment, subnetIds ]
+      SecurityGroups:
+        - !Ref OrchFrontendAlbSecurityGroup
+
+  OrchFrontendAlbTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-alb-tg
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
+      TargetType: ip
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "traffic-port"
+      HealthCheckPath: "/orch-frontend/health"
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+
+  OrchFrontendAlbListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OrchFrontendAlbTargetGroup
+      LoadBalancerArn: !Ref OrchFrontendAlb
+      Port: 80
+      Protocol: HTTP
+
+  # Network Load Balancer
+  OrchFrontendNlb:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-nlb
+      Type: network
+      Subnets: !FindInMap [ EnvironmentConfiguration, !Ref Environment, subnetIds ]
+      SecurityGroups:
+        - !Ref OrchFrontendNlbSecurityGroup
+
+  OrchFrontendNlbTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Name: !Sub ${Environment}-orch-frontend-nlb-tg
+      Port: 80
+      Protocol: TCP
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
+      Targets:
+        - Id: !Ref OrchFrontendAlb
+      TargetType: alb
+      HealthCheckPort: "traffic-port"
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+
+  OrchFrontendNlbListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref OrchFrontendNlbTargetGroup
+      LoadBalancerArn: !Ref OrchFrontendNlb
+      Port: 80
+      Protocol: TCP
+
+  # Security Groups and Ingress / Egress rules
+  OrchFrontendECSTaskSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for ECS Tasks"
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
+
+  OrchFrontendECSTaskSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 3000
+      ToPort: 3000
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+  
+  OrchFrontendECSTaskSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      CidrIp: 0.0.0.0/0
+      Description: Allow outbound HTTPS traffic to Internet
+      FromPort: 443
+      IpProtocol: tcp
+      ToPort: 443
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+
+  OrchFrontendAlbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for OrchFrontendAlb"
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
+
+  OrchFrontendAlbSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+  
+  OrchFrontendAlbSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 3000
+      ToPort: 3000
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendECSTaskSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+
+  OrchFrontendNlbSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for OrchFrontendNlb"
+      VpcId: !FindInMap [ EnvironmentConfiguration, !Ref Environment, vpcId ]
+
+  OrchFrontendNlbSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: "tcp"
+      FromPort: 80
+      ToPort: 80
+      CidrIp: "0.0.0.0/0"
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+
+  OrchFrontendNlbSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: "-1"
+      FromPort: 80
+      ToPort: 80
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+          - OrchFrontendAlbSecurityGroup
+          - GroupId
+      GroupId:
+        Fn::GetAtt:
+          - OrchFrontendNlbSecurityGroup
+          - GroupId
+
+Outputs:
+  # OrchFrontendNlbDnsName and OrchFrontendNlbArn are used by the API Gateway (di-authentication-api) to define the NLB integration and VPC Link
+  OrchFrontendNlbDnsName:
+    Description: The DNS Name of the Orchestration Frontend NLB
+    Value: !GetAtt OrchFrontendNlb.DNSName
+
+  OrchFrontendNlbArn:
+    Description: The ARN of the Orchestration Frontend NLB
+    Value: !Ref OrchFrontendNlb
+
