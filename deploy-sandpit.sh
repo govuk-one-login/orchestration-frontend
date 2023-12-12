@@ -18,8 +18,8 @@ build_and_tag_docker_image() {
     docker tag "${REPO_NAME}:latest" "${REPO_URL}:${IMAGE_TAG}"
 }
 
-update_ecs_template() {
-    pushd "./infrastructure/sandpit/ecs"
+update_template() {
+    pushd "./infrastructure"
     if grep -q "CONTAINER-IMAGE-PLACEHOLDER" template.yaml; then
         echo "Replacing \"CONTAINER-IMAGE-PLACEHOLDER\" with ECR image ref..."
         cp template.yaml template_tmp.yaml
@@ -32,12 +32,12 @@ update_ecs_template() {
 }
 
 deploy_to_ecs() {
-    pushd "./infrastructure/sandpit/ecs"
-    parameters=$(cat ../parameters.json | jq -r '.[] | "\(.ParameterKey)=\(.ParameterValue)"')
+    pushd "./infrastructure"
+    parameters=$(cat ./sandpit/parameters.json | jq -r '.[] | "\(.ParameterKey)=\(.ParameterValue)"')
     echo ${parameters}
     echo "Deploying to ECS..."
     sam build
-    sam deploy --stack-name sandpit-orch-frontend --template-file template_tmp.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
+    sam deploy --stack-name sandpit-orch-f-deploy --template-file template_tmp.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
     rm template_tmp.yaml
     popd
 }
@@ -49,6 +49,6 @@ update_ecs_service() {
 
 generate_ecr_credentials
 build_and_tag_docker_image
-update_ecs_template
+update_template
 deploy_to_ecs
 update_ecs_service

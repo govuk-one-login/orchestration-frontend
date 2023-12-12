@@ -34,6 +34,10 @@ Mappings:
   EnvironmentConfiguration:
     sandpit:
       vpcId: vpc-0b6f4a5d72f84ed0c
+      subnetIds:
+      - subnet-0027e271c35f828c1
+      - subnet-0b648700a8ac43736
+      - subnet-01b7b1c835828eb3d
     dev:
       vpcId: vpc-024506f732c8d477f
     build:
