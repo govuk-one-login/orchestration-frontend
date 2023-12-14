@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Push ECR and deploy
-        uses: govuk-one-login/devplatform-upload-action-ecr@1.1.0
+        uses: govuk-one-login/devplatform-upload-action-ecr@1.1.1
         with:
           docker-build-path: ./
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
