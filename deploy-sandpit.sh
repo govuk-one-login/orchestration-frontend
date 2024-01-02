@@ -37,7 +37,7 @@ deploy_to_ecs() {
     echo ${parameters}
     echo "Deploying to ECS..."
     sam build
-    sam deploy --stack-name sandpit-orch-f-deploy --template-file template_tmp.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
+    sam deploy --stack-name sandpit-orch-fe-deploy --template-file template_tmp.yaml --parameter-overrides $parameters --no-fail-on-empty-changeset --capabilities CAPABILITY_NAMED_IAM
     rm template_tmp.yaml
     popd
 }

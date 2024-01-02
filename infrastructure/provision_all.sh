@@ -9,10 +9,10 @@ export AWS_PAGER=""
 ## Provision dependencies
 for dir in configuration/"$AWS_ACCOUNT"/*/; do
   STACK=$(basename "$dir")
-  if [[ $STACK != "$AWS_ACCOUNT-orch-f-pipeline" && -f configuration/$AWS_ACCOUNT/$STACK/parameters.json ]]; then
+  if [[ $STACK != "$AWS_ACCOUNT-orch-fe-pipeline" && -f configuration/$AWS_ACCOUNT/$STACK/parameters.json ]]; then
     $PROVISION_COMMAND "$AWS_ACCOUNT" "$STACK" "$STACK" LATEST &
   fi
 done
 
 ## Provision secure pipelines
-$PROVISION_COMMAND "$AWS_ACCOUNT" "$AWS_ACCOUNT"-orch-f-pipeline sam-deploy-pipeline LATEST
+$PROVISION_COMMAND "$AWS_ACCOUNT" "$AWS_ACCOUNT"-orch-fe-pipeline sam-deploy-pipeline LATEST
