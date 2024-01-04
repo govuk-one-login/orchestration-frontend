@@ -1,6 +1,6 @@
 [
   {
     "ParameterKey": "PipelineStackName",
-    "ParameterValue": "build-orch-f-pipeline"
+    "ParameterValue": "build-orch-fe-pipeline"
   }
 ]

@@ -55,6 +55,8 @@ It is assumed that the account provisioning stack has already been run and that 
 
 - ECR
 
+Ensure you are logged into an AWS account via SSO before deploying
+
 Sandpit can be deployed using:
 
 ```shell script

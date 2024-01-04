@@ -148,7 +148,7 @@ jobs:
 
       - name: SAM validate
         run: sam validate
-        working-directory: infrastructure/sandpit/ecs
+        working-directory: ./infrastructure
 
   sonarcloud:
     runs-on: ubuntu-latest

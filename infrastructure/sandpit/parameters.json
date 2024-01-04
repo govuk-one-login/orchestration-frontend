@@ -4,11 +4,7 @@
     "ParameterValue": "sandpit"
   },
   {
-    "ParameterKey": "AWSAccount",
-    "ParameterValue": "761723964695"
-  },
-  {
-    "ParameterKey": "Region",
-    "ParameterValue": "eu-west-2"
+    "ParameterKey": "VpcStackName",
+    "ParameterValue": "none"
   }
 ]
