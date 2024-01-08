@@ -2,6 +2,20 @@ import { pino } from "pino";
 import PinoHttp from "pino-http";
 import { getLogLevel } from "../config";
 
+const ignorePaths = [
+  "/orch-frontend/public/scripts/cookies.js",
+  "/orch-frontend/public/scripts/all.js",
+  "/orch-frontend/public/style.css",
+  "/orch-frontend/public/scripts",
+  "/orch-frontend/public/scripts/application.js",
+  "/orch-frontend/assets/images/govuk-crest-2x.png",
+  "/orch-frontend/assets/fonts/bold-b542beb274-v2.woff2",
+  "/orch-frontend/assets/fonts/bold-b542beb274-v2.woff2",
+  "/orch-frontend/assets/images/favicon.ico",
+  "/orch-frontend/assets/fonts/light-94a07e06a1-v2.woff2",
+  "/orch-frontend/health",
+];
+
 const logger = pino({
   name: "di-orch",
   level: getLogLevel(),
@@ -43,19 +57,7 @@ const loggerMiddleware = PinoHttp({
   logger,
   wrapSerializers: false,
   autoLogging: {
-    ignorePaths: [
-      "/orch-frontend/public/scripts/cookies.js",
-      "/orch-frontend/public/scripts/all.js",
-      "/orch-frontend/public/style.css",
-      "/orch-frontend/public/scripts",
-      "/orch-frontend/public/scripts/application.js",
-      "/orch-frontend/assets/images/govuk-crest-2x.png",
-      "/orch-frontend/assets/fonts/bold-b542beb274-v2.woff2",
-      "/orch-frontend/assets/fonts/bold-b542beb274-v2.woff2",
-      "/orch-frontend/assets/images/favicon.ico",
-      "/orch-frontend/assets/fonts/light-94a07e06a1-v2.woff2",
-      "/orch-frontend/health",
-    ],
+    ignore: (req) => ignorePaths.includes(req.url),
   },
   customErrorMessage: function (error, res) {
     return "request errored with status code: " + res.statusCode;
