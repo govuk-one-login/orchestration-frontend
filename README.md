@@ -31,6 +31,8 @@ You can run the app in Docker using:
 
 ### Running app locally:
 
+_Please ensure you are using the correct node version locally (Found in Dockerfile)_
+
 #### Build
 
 > To build the app
