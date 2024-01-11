@@ -19,7 +19,7 @@ import { loggerMiddleware } from "./utils/logger";
 
 const APP_VIEWS = [
   path.join(__dirname, "components"),
-  path.resolve("node_modules/govuk-frontend/"),
+  path.resolve("node_modules/govuk-frontend/dist"),
 ];
 
 async function createApp(): Promise<express.Application> {
@@ -36,7 +36,9 @@ async function createApp(): Promise<express.Application> {
 
   router.use(
     "/assets",
-    express.static(path.resolve("node_modules/govuk-frontend/govuk/assets"))
+    express.static(
+      path.resolve("node_modules/govuk-frontend/dist/govuk/assets")
+    )
   );
 
   router.use("/public", express.static(path.join(__dirname, "public")));
