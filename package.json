@@ -4,9 +4,6 @@
   "description": "",
   "author": "",
   "license": "ISC",
-  "engines": {
-    "node": "20.9"
-  },
   "scripts": {
     "build": "npm run build-sass && npx tsc && npm run copy-assets",
     "build-sass": "rm -rf dist/public/style.css && sass --load-path=node_modules/govuk-frontend/dist/govuk --no-source-map --quiet-deps src/assets/scss/application.scss:dist/public/style.css --style compressed",
