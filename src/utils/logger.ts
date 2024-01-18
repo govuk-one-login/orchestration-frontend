@@ -4,7 +4,7 @@ import { getLogLevel } from "../config";
 
 const ignorePaths = [
   "/orch-frontend/public/scripts/cookies.js",
-  "/orch-frontend/public/scripts/govuk-frontend.min.js",
+  "/orch-frontend/public/scripts/all.js",
   "/orch-frontend/public/style.css",
   "/orch-frontend/public/scripts",
   "/orch-frontend/public/scripts/application.js",
