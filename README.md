@@ -21,6 +21,16 @@ brew install aws-sam-cli --build-from-source
 
 Create a copy of the .env.sample file and rename it .env
 
+### Set the analytics environment variables
+
+Add environment variables to your .env file:
+
+UNIVERSAL_ANALYTICS_GTM_CONTAINER_ID="GTM-XXXXXXX"
+GOOGLE_ANALYTICS_4_GTM_CONTAINER_ID="GTM-XXXXXXX"
+GA4_DISABLED="false"
+UA_DISABLED="true"
+ANALYTICS_COOKIE_DOMAIN="localhost"
+
 ### Running in Docker
 
 You can run the app in Docker using:

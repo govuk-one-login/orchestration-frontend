@@ -1,4 +1,5 @@
 {% extends "common/layout/base.njk" %}
+{% from "ga4-opl/macro.njk" import ga4OnPageLoad %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% set pageTitleName = 'pages.permanentlyLockedScreen.title' | translate %}
 
@@ -8,4 +9,5 @@
     <p class="govuk-heading-m">{{ 'pages.permanentlyLockedScreen.content.whatYouCanDo' | translate }}</p>
     <p class="govuk-body">{{ 'pages.permanentlyLockedScreen.content.paragraph2' | translate }}</p>
     <p class="govuk-body">{{ 'pages.permanentlyLockedScreen.content.paragraph3' | translate }}</p>
+    {{ga4OnPageLoad({ nonce: scriptNonce,statusCode:"200",englishPageTitle:"pages.permanentlyLockedScreen.title" | translate, taxonomyLevel1: "account", taxonomyLevel2:"orchestration", contentId:"003",loggedInStatus:true,dynamic:true})}}
 {% endblock %}

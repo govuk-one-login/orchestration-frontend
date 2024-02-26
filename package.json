@@ -9,7 +9,7 @@
     "build-sass": "rm -rf dist/public/style.css dist/govuk-frontend/all-ie8.css && sass --load-path=node_modules/govuk-frontend/govuk --no-source-map --quiet-deps src/assets/scss/application.scss:dist/public/style.css src/assets/scss/ie8.scss:dist/govuk-frontend/all-ie8.css --style compressed",
     "clean": "rm -rf dist node_modules logs.json",
     "clean-build": "npm run clean && npm i && npm run build",
-    "copy-assets": "mkdir -p dist && copyfiles -u 1 src/**/*.njk dist/ src/locales/**/** dist/ src/config/*.txt dist/ && copyfiles -u 3 src/assets/javascript/*.js dist/public/scripts -e **/all.js && cp node_modules/govuk-frontend/govuk/all.js dist/public/scripts",
+    "copy-assets": "mkdir -p dist && copyfiles -u 1 src/**/*.njk dist/ src/locales/**/** dist/ src/config/*.txt dist/ && copyfiles -u 3 src/assets/javascript/*.js dist/public/scripts -e **/all.js && copyfiles -u 4 node_modules/@govuk-one-login/one-login-analytics/lib/analytics.js dist/public/scripts && copyfiles -u 3 src/assets/images/* dist/public/images && cp node_modules/govuk-frontend/govuk/all.js dist/public/scripts",
     "start": "node dist/server.js",
     "test:unit": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --exclude \"src/**/*-integration.test.ts\" --recursive \"src/**/*.test.ts\"",
     "test:integration": "rm -rf test/coverage && NODE_ENV=development SUPPORT_LANGUAGE_CY=1 npx mocha --recursive \"src/**/*-integration.test.ts\"",
@@ -41,6 +41,7 @@
     "semi": true
   },
   "dependencies": {
+    "@govuk-one-login/one-login-analytics": "0.0.9",
     "axios": "^1.6.7",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
