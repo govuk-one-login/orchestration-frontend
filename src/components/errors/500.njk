@@ -1,5 +1,4 @@
 {% extends "common/layout/base.njk" %}
-{% from "ga4-opl/macro.njk" import ga4OnPageLoad %}
 {% set pageTitleName = 'error.error500.title' | translate %}
 
 {% block content %}
@@ -9,5 +8,5 @@
     <p class="govuk-body">{{ 'error.error500.content.paragraph1' | translate }}</p>
   </div>
 </div>
-{{ga4OnPageLoad({ nonce: scriptNonce,statusCode:"500",englishPageTitle:"error.error500.title" | translate, taxonomyLevel1: "account", taxonomyLevel2:"orchestration", contentId:"002",loggedInStatus:true,dynamic:true})}}
+{{ga4OnPageLoad({ nonce: scriptNonce,statusCode:"500",englishPageTitle:"error.error500.title" | translate, taxonomyLevel1: "account", taxonomyLevel2:"orchestration", contentId:"002",loggedInStatus:true,dynamic:false})}}
 {% endblock %}
