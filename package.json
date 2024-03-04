@@ -52,7 +52,7 @@
     "pino": "8.19.0",
     "pino-http": "9.0.0",
     "sass": "^1.71.1",
-    "xss": "^1.0.10"
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",
