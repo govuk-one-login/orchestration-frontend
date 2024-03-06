@@ -10,6 +10,7 @@ import i18nextMiddleware from "i18next-http-middleware";
 import { proveIdentityCallbackRouter } from "./components/prove-identity-callback/prove-identity-callback-routes";
 import { noCacheMiddleware } from "./middleware/no-cache-middleware";
 import { getSessionIdMiddleware } from "./middleware/session-middleware";
+import { languageToggleMiddleware } from "./middleware/language-toggle-middleware";
 import { serverErrorHandler } from "./handlers/internal-server-error-handler";
 import { errorPageGet } from "./components/errors/error-controller";
 import { PATH_NAMES } from "./app.constants";
@@ -20,6 +21,7 @@ import { loggerMiddleware } from "./utils/logger";
 const APP_VIEWS = [
   path.join(__dirname, "components"),
   path.resolve("node_modules/govuk-frontend/"),
+  path.resolve("node_modules/@govuk-one-login/")
 ];
 
 async function createApp(): Promise<express.Application> {
@@ -55,6 +57,8 @@ async function createApp(): Promise<express.Application> {
   router.use(cookieParser());
 
   router.use(getSessionIdMiddleware);
+
+  router.use(languageToggleMiddleware);
 
   router.use(proveIdentityCallbackRouter);
   router.get(PATH_NAMES.NOT_AVAILABLE, permanentlyLockedController);

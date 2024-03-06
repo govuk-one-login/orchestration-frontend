@@ -2,7 +2,7 @@
 {% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-
+{% from "one-login-language-toggle/macro.njk" import oneloginLanguageSelect %}
 {% set assetPath="/orch-frontend/assets" %}
 {% block head %}
 
@@ -61,12 +61,40 @@
           html: phaseBannerText
         }) }}
 	      {% block beforeContent %}{% endblock %}
-	      {% if showBack %}
-	        {{ govukBackLink({
-                text: "general.back" | translate,
-                href: hrefBack
-            }) }}
-          {% endif %}
+
+        <div class="govuk-width-container">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+            {% if showBack %}
+              {{ govukBackLink({
+                    text: "general.back" | translate,
+                    href: hrefBack
+                }) }}
+              {% endif %}
+
+
+            </div>
+            <div class="govuk-grid-column-one-third last-item">
+              {% if showLanguageToggle %}
+                {{ oneloginLanguageSelect({
+                  ariaLabel: 'general.base.languageToggle.ariaLabel' | translate,
+                  activeLanguage: htmlLang,
+                  class: "govuk-!-margin-bottom-1",
+                  languages: [
+                  { 
+                    code: 'en',
+                    text: 'English'
+                  },
+                  {
+                    code:'cy',
+                    text: 'Cymraeg'
+                  }]
+                })
+              }}
+              {% endif %}
+            </div>
+          </div>
+        </div>  
 	      <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds {{ rowClasses }}">
