@@ -21,7 +21,7 @@ import { loggerMiddleware } from "./utils/logger";
 const APP_VIEWS = [
   path.join(__dirname, "components"),
   path.resolve("node_modules/govuk-frontend/"),
-  path.resolve("node_modules/@govuk-one-login/")
+  path.resolve("node_modules/@govuk-one-login/"),
 ];
 
 async function createApp(): Promise<express.Application> {
