@@ -8,7 +8,7 @@ export function languageToggleMiddleware(
   res: Response,
   next: NextFunction
 ): void {
-    res.locals.htmlLang = req.i18n.language;
-    res.locals.showLanguageToggle = process.env.LANGUAGE_TOGGLE === "1";
-    next();
+  res.locals.htmlLang = req.i18n.language;
+  res.locals.showLanguageToggle = process.env.LANGUAGE_TOGGLE === "1";
+  next();
 }
