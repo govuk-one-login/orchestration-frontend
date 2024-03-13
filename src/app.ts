@@ -10,6 +10,7 @@ import i18nextMiddleware from "i18next-http-middleware";
 import { proveIdentityCallbackRouter } from "./components/prove-identity-callback/prove-identity-callback-routes";
 import { noCacheMiddleware } from "./middleware/no-cache-middleware";
 import { getSessionIdMiddleware } from "./middleware/session-middleware";
+import { setGTM } from "./middleware/analytics-middleware";
 import { serverErrorHandler } from "./handlers/internal-server-error-handler";
 import { errorPageGet } from "./components/errors/error-controller";
 import { PATH_NAMES } from "./app.constants";
@@ -55,7 +56,7 @@ async function createApp(): Promise<express.Application> {
   router.use(cookieParser());
 
   router.use(getSessionIdMiddleware);
-
+  router.use(setGTM);
   router.use(proveIdentityCallbackRouter);
   router.get(PATH_NAMES.NOT_AVAILABLE, permanentlyLockedController);
   router.get(PATH_NAMES.UNAVAILABLE, suspendedPageController);
