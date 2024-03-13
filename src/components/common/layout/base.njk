@@ -62,40 +62,31 @@
           html: phaseBannerText
         }) }}
 	      {% block beforeContent %}{% endblock %}
-
-        <div class="govuk-width-container">
-          <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-            {% if showBack %}
-              {{ govukBackLink({
-                    text: "general.back" | translate,
-                    href: hrefBack
-                }) }}
-              {% endif %}
-
-
-            </div>
-            <div class="govuk-grid-column-one-third last-item">
-              {% if showLanguageToggle %}
-                {{ oneloginLanguageSelect({
-                  ariaLabel: 'general.base.languageToggle.ariaLabel' | translate,
-                  activeLanguage: htmlLang,
-                  class: "govuk-!-margin-bottom-1",
-                  languages: [
-                  { 
-                    code: 'en',
-                    text: 'English'
-                  },
-                  {
-                    code:'cy',
-                    text: 'Cymraeg'
-                  }]
-                })
-              }}
-              {% endif %}
-            </div>
-          </div>
-        </div>  
+        {% if showLanguageToggle %}
+          {{ oneloginLanguageSelect({
+            ariaLabel: 'general.languageToggle.ariaLabel' | translate,
+            activeLanguage: htmlLang,
+            class: "",
+            languages: [
+            { 
+              code: 'en',
+              text: 'English',
+              visuallyHidden: 'Change to English'
+            },
+            {
+              code:'cy',
+              text: 'Cymraeg',
+              visuallyHidden: 'Newid yr iaith ir Gymraeg'
+            }]
+          })
+          }}
+        {% endif %}
+        {% if showBack %}
+	        {{ govukBackLink({
+                text: "general.back" | translate,
+                href: hrefBack
+            }) }}
+          {% endif %}
 	      <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds {{ rowClasses }}">
