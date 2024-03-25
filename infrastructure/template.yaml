@@ -149,6 +149,95 @@ Resources:
             - Name: API_KEY
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key
 
+  OrchFrontendScalingPolicyScaleIn:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: orch-frontend-scale-in-policy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref OrchFrontendScalingTarget
+      StepScalingPolicyConfiguration: 
+        AdjustmentType: PercentChangeInCapacity
+        Cooldown: 240
+        MetricAggregationType: Average
+        MinAdjustmentMagnitude: 5
+        StepAdjustments: 
+          - MetricIntervalUpperBound: -40
+            ScalingAdjustment: -50
+
+  OrchFrontendScalingPolicyScaleOut:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: orch-frontend-scale-out-policy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref OrchFrontendScalingTarget
+      StepScalingPolicyConfiguration: 
+        AdjustmentType: PercentChangeInCapacity
+        Cooldown: 60
+        MetricAggregationType: Average
+        MinAdjustmentMagnitude: 10
+        StepAdjustments: 
+          - MetricIntervalLowerBound: 0
+            MetricIntervalUpperBound: 10
+            ScalingAdjustment: 300
+          - MetricIntervalLowerBound: 10
+            MetricIntervalUpperBound: 30
+            ScalingAdjustment: 600
+          - MetricIntervalLowerBound: 30
+            ScalingAdjustment: 1000
+
+  OrchFrontendScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 4
+      MinCapacity: 2
+      ResourceId: !Sub 'service/${Environment}-orch-app-cluster/${Environment}-orch-frontend-ecs-service'
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  EcsServiceScaleInAlarm: 
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: True
+      AlarmActions: 
+        - !GetAtt OrchFrontendScalingPolicyScaleIn.Arn
+      AlarmDescription: "Metric alarm to trigger ECS scale down"
+      AlarmName: !Sub '${Environment}-orch-app-cluster/orch-frontend-ecs-service-AlarmScaleDown'
+      ComparisonOperator: LessThanThreshold
+      DatapointsToAlarm: 5
+      Dimensions: 
+        - Name: ClusterName
+          Value: !Sub '${Environment}-orch-app-cluster'
+        - Name: ServiceName
+          Value: !Sub '${Environment}-orch-frontend-ecs-service'
+      EvaluationPeriods: 5
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Period: 30
+      Statistic: Average
+      Threshold: 50
+
+  EcsServiceScaleOutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: True
+      AlarmActions: 
+        - !GetAtt OrchFrontendScalingPolicyScaleOut.Arn
+      AlarmDescription: "Metric alarm to trigger ECS scale up"
+      AlarmName: !Sub ${Environment}-orch-app-cluster/orch-frontend-ecs-service-AlarmScaleUp"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      DatapointsToAlarm: 2
+      Dimensions: 
+        - Name: ClusterName
+          Value: !Sub '${Environment}-orch-app-cluster'
+        - Name: ServiceName
+          Value: !Sub '${Environment}-orch-frontend-ecs-service'
+      EvaluationPeriods: 2
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Period: 30
+      Statistic: Average
+      Threshold: 50
+
   # Application Load Balancer
   OrchFrontendAlb:
     Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
