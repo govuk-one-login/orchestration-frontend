@@ -166,7 +166,7 @@ Resources:
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
-      HealthCheckPath: "/orch-frontend/health"
+      HealthCheckPath: "/health"
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
