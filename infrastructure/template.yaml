@@ -29,6 +29,8 @@ Conditions:
     !Not [ !Equals [ none, !Ref PermissionsBoundary ] ]
   IsProd:
     !Equals [ production, !Ref Environment ]
+  OidcApiGatewayIntegrationEnabled:
+    !Equals [ sandpit, !Ref Environment ]
 
 Mappings:
   EnvironmentConfiguration:
@@ -166,7 +168,10 @@ Resources:
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
-      HealthCheckPath: "/orch-frontend/health"
+      HealthCheckPath: !If
+        - OidcApiGatewayIntegrationEnabled
+        - "/health"
+        - "/orch-frontend/health"
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
