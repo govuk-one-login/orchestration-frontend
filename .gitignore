@@ -10,3 +10,8 @@ node_modules/
 # Additional ignores
 .idea
 .aws-sam
+
+# Code coverage results
+coverage
+*.lcov
+.nyc_output
