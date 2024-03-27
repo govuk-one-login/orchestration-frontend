@@ -57,8 +57,8 @@ async function createApp(): Promise<express.Application> {
   router.use(getSessionIdMiddleware);
 
   router.use(proveIdentityCallbackRouter);
-  router.get(PATH_NAMES.NOT_AVAILABLE, permanentlyLockedController);
-  router.get(PATH_NAMES.UNAVAILABLE, suspendedPageController);
+  router.get(PATH_NAMES.UNAVAILABLE_PERMANENT, permanentlyLockedController);
+  router.get(PATH_NAMES.UNAVAILABLE_TEMPORARY, suspendedPageController);
   router.get(PATH_NAMES.ERROR_PAGE, errorPageGet);
   router.use(serverErrorHandler);
   router.use(pageNotFoundHandler);

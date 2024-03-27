@@ -24,10 +24,10 @@ export const OIDC_ERRORS = {
 };
 
 export const PATH_NAMES = {
-  NOT_AVAILABLE: "/not-available",
+  UNAVAILABLE_PERMANENT: "/unavailable-permanent",
   PROVE_IDENTITY_CALLBACK: "/ipv-callback",
   PROVE_IDENTITY_CALLBACK_SESSION_EXPIRY_ERROR:
     "/ipv-callback-session-expiry-error",
-  UNAVAILABLE: "/unavailable",
+  UNAVAILABLE_TEMPORARY: "/unavailable-temporary",
   ERROR_PAGE: "/error",
 };
