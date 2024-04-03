@@ -40,20 +40,26 @@ Mappings:
       - subnet-0027e271c35f828c1
       - subnet-0b648700a8ac43736
       - subnet-01b7b1c835828eb3d
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     dev:
       vpcId: vpc-024506f732c8d477f
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     build:
       vpcId: vpc-03db44fa71b8d00b2
       subnetIds: 
        - subnet-06431beae9b136e15
        - subnet-016db45a259212743
        - subnet-0f595928b921f038a
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     staging:
       vpcId: vpc-0ca40c7d13490419d
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     integration:
       vpcId: vpc-04444d1dc96d8822c
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     production:
       vpcId: vpc-00012e96e1cd0bf95
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables 
 
 Resources:
   # ECS
@@ -93,6 +99,22 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
         - !Ref OrchFrontendECSSecretsManagerAccessManagedPolicy
+      Policies:
+        - PolicyName: GetDynatraceSecret
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:ListSecrets                                
+                  - secretsmanager:GetSecretValue                             
+                Resource:
+                  - arn:aws:secretsmanager:eu-west-2:216552277552:secret:*    
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource:
+                  - arn:aws:kms:eu-west-2:216552277552:key/*
       PermissionsBoundary: !If
         - UsePermissionsBoundary
         - !Ref PermissionsBoundary
@@ -148,6 +170,21 @@ Resources:
           Secrets:
             - Name: API_KEY
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key
+            - Name: DT_TENANT
+              ValueFrom: !Join
+                - ''
+                - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                  - ':DT_TENANT::'
+            - Name: DT_TENANTTOKEN
+              ValueFrom: !Join
+                - ''
+                - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                  - ':DT_TENANTTOKEN::'
+            - Name: DT_CONNECTION_POINT
+              ValueFrom: !Join
+              - ''
+              - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                - ':DT_CONNECTION_POINT::'
 
   OrchFrontendScalingPolicyScaleIn:
     Type: AWS::ApplicationAutoScaling::ScalingPolicy
