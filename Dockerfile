@@ -7,7 +7,7 @@ COPY ./src ./src
 RUN npm install 
 RUN npm run build
 
-COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules:nodejs / /
+COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules-musl:nodejs / /
 ENV LD_PRELOAD /opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so
 
 FROM node:20.12.0 as release
