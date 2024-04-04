@@ -1,4 +1,4 @@
-FROM node:20.12.0 as base
+FROM node:20.12.1 as base
 WORKDIR /app
 COPY package-lock.json ./
 COPY package.json ./
@@ -10,7 +10,7 @@ RUN npm run build
 COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules-musl:nodejs / /
 ENV LD_PRELOAD /opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so
 
-FROM node:20.12.0 as release
+FROM node:20.12.1 as release
 WORKDIR /app
 COPY --chown=node:node --from=base /app/package*.json ./
 COPY --chown=node:node --from=base /app/node_modules/ node_modules
