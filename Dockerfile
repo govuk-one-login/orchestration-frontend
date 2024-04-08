@@ -7,14 +7,14 @@ COPY ./src ./src
 RUN npm install 
 RUN npm run build
 
-COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules-musl:nodejs / /
-ENV LD_PRELOAD /opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so
-
 FROM node:20.12.1 as release
 WORKDIR /app
 COPY --chown=node:node --from=base /app/package*.json ./
 COPY --chown=node:node --from=base /app/node_modules/ node_modules
 COPY --chown=node:node --from=base /app/dist/ dist
+
+COPY --from=khw46367.live.dynatrace.com/linux/oneagent-codemodules:nodejs / /
+ENV LD_PRELOAD /opt/dynatrace/oneagent/agent/lib64/liboneagentproc.so
 
 ENV NODE_ENV "production"
 ENV PORT 3000
