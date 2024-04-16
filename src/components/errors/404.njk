@@ -15,4 +15,6 @@
         "type": "Submit",
         "href": "error.error404.content.govUKHomepageButtonHref" | translate
     }) }}
+    
+    {{ga4OnPageLoad({ nonce: scriptNonce,statusCode:"404",englishPageTitle:"error.error404.title" | translate, taxonomyLevel1: "undefined", taxonomyLevel2:"undefined", contentId:"undefined",loggedInStatus:false,dynamic:false})}}
 {% endblock %}
