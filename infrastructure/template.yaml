@@ -29,6 +29,8 @@ Conditions:
     !Not [ !Equals [ none, !Ref PermissionsBoundary ] ]
   IsProd:
     !Equals [ production, !Ref Environment ]
+  OidcApiGatewayIntegrationEnabled:
+    !Equals [ sandpit, !Ref Environment ]
 
 Mappings:
   EnvironmentConfiguration:
@@ -38,20 +40,26 @@ Mappings:
       - subnet-0027e271c35f828c1
       - subnet-0b648700a8ac43736
       - subnet-01b7b1c835828eb3d
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     dev:
       vpcId: vpc-024506f732c8d477f
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     build:
       vpcId: vpc-03db44fa71b8d00b2
       subnetIds: 
        - subnet-06431beae9b136e15
        - subnet-016db45a259212743
        - subnet-0f595928b921f038a
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     staging:
       vpcId: vpc-0ca40c7d13490419d
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     integration:
       vpcId: vpc-04444d1dc96d8822c
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     production:
       vpcId: vpc-00012e96e1cd0bf95
+      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceProductionVariables 
 
 Resources:
   # ECS
@@ -91,6 +99,22 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
         - !Ref OrchFrontendECSSecretsManagerAccessManagedPolicy
+      Policies:
+        - PolicyName: GetDynatraceSecret
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:ListSecrets                                
+                  - secretsmanager:GetSecretValue                             
+                Resource:
+                  - arn:aws:secretsmanager:eu-west-2:216552277552:secret:*    
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource:
+                  - arn:aws:kms:eu-west-2:216552277552:key/*
       PermissionsBoundary: !If
         - UsePermissionsBoundary
         - !Ref PermissionsBoundary
@@ -146,6 +170,110 @@ Resources:
           Secrets:
             - Name: API_KEY
               ValueFrom: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/${Environment}/frontend-api-key
+            - Name: DT_TENANT
+              ValueFrom: !Join
+                - ''
+                - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                  - ':DT_TENANT::'
+            - Name: DT_TENANTTOKEN
+              ValueFrom: !Join
+                - ''
+                - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                  - ':DT_TENANTTOKEN::'
+            - Name: DT_CONNECTION_POINT
+              ValueFrom: !Join
+              - ''
+              - - !FindInMap [ EnvironmentConfiguration, !Ref Environment, dynatraceSecretArn ]
+                - ':DT_CONNECTION_POINT::'
+
+  OrchFrontendScalingPolicyScaleIn:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: orch-frontend-scale-in-policy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref OrchFrontendScalingTarget
+      StepScalingPolicyConfiguration: 
+        AdjustmentType: PercentChangeInCapacity
+        Cooldown: 240
+        MetricAggregationType: Average
+        MinAdjustmentMagnitude: 5
+        StepAdjustments: 
+          - MetricIntervalUpperBound: -40
+            ScalingAdjustment: -50
+
+  OrchFrontendScalingPolicyScaleOut:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: orch-frontend-scale-out-policy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref OrchFrontendScalingTarget
+      StepScalingPolicyConfiguration: 
+        AdjustmentType: PercentChangeInCapacity
+        Cooldown: 60
+        MetricAggregationType: Average
+        MinAdjustmentMagnitude: 10
+        StepAdjustments: 
+          - MetricIntervalLowerBound: 0
+            MetricIntervalUpperBound: 10
+            ScalingAdjustment: 300
+          - MetricIntervalLowerBound: 10
+            MetricIntervalUpperBound: 30
+            ScalingAdjustment: 600
+          - MetricIntervalLowerBound: 30
+            ScalingAdjustment: 1000
+
+  OrchFrontendScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 4
+      MinCapacity: 2
+      ResourceId: !Sub 'service/${Environment}-orch-app-cluster/${Environment}-orch-frontend-ecs-service'
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  EcsServiceScaleInAlarm: 
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: True
+      AlarmActions: 
+        - !GetAtt OrchFrontendScalingPolicyScaleIn.Arn
+      AlarmDescription: "Metric alarm to trigger ECS scale down"
+      AlarmName: !Sub '${Environment}-orch-app-cluster/orch-frontend-ecs-service-AlarmScaleDown'
+      ComparisonOperator: LessThanThreshold
+      DatapointsToAlarm: 5
+      Dimensions: 
+        - Name: ClusterName
+          Value: !Sub '${Environment}-orch-app-cluster'
+        - Name: ServiceName
+          Value: !Sub '${Environment}-orch-frontend-ecs-service'
+      EvaluationPeriods: 5
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Period: 30
+      Statistic: Average
+      Threshold: 50
+
+  EcsServiceScaleOutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      ActionsEnabled: True
+      AlarmActions: 
+        - !GetAtt OrchFrontendScalingPolicyScaleOut.Arn
+      AlarmDescription: "Metric alarm to trigger ECS scale up"
+      AlarmName: !Sub ${Environment}-orch-app-cluster/orch-frontend-ecs-service-AlarmScaleUp"
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      DatapointsToAlarm: 2
+      Dimensions: 
+        - Name: ClusterName
+          Value: !Sub '${Environment}-orch-app-cluster'
+        - Name: ServiceName
+          Value: !Sub '${Environment}-orch-frontend-ecs-service'
+      EvaluationPeriods: 2
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Period: 30
+      Statistic: Average
+      Threshold: 50
 
   # Application Load Balancer
   OrchFrontendAlb:
@@ -166,7 +294,10 @@ Resources:
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
-      HealthCheckPath: "/orch-frontend/health"
+      HealthCheckPath: !If
+        - OidcApiGatewayIntegrationEnabled
+        - "/health"
+        - "/orch-frontend/health"
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
