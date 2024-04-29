@@ -1,0 +1,16 @@
+name: Deploy frontend dev
+
+permissions:
+  id-token: write
+  contents: read
+
+on: workflow_dispatch
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-frontend.yml
+    secrets:
+      ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_ARTIFACT_BUCKET_NAME }}
+      CONTAINER_SIGN_KMS_KEY: ${{ secrets.DEV_CONTAINER_SIGN_KMS_KEY }}
+      GH_ACTIONS_ROLE_ARN: ${{ secrets.DEV_GH_ACTIONS_ROLE_ARN }}
+      ECR_REPOSITORY: ${{ secrets.DEV_ECR_REPOSITORY }}

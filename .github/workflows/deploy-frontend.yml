@@ -5,9 +5,17 @@ permissions:
   contents: read
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    secrets:
+      ARTIFACT_BUCKET_NAME:
+        required: true
+      CONTAINER_SIGN_KMS_KEY:
+        required: True
+      GH_ACTIONS_ROLE_ARN:
+        required: true
+      ECR_REPOSITORY:
+        required: true
+
 
 jobs:
   run-checks:
