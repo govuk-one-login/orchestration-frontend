@@ -19,6 +19,7 @@ jobs:
     uses: ./.github/workflows/deploy-frontend.yml
     needs: run-checks
     secrets:
+      DYNATRACE_PAAS_TOKEN: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
       ARTIFACT_BUCKET_NAME: ${{ secrets.ARTIFACT_BUCKET_NAME }}
       CONTAINER_SIGN_KMS_KEY: ${{ secrets.CONTAINER_SIGN_KMS_KEY }}
       GH_ACTIONS_ROLE_ARN: ${{ secrets.GH_ACTIONS_ROLE_ARN }}
