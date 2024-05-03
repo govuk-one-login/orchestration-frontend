@@ -7,9 +7,16 @@ permissions:
 on: workflow_dispatch
 
 jobs:
+  run-checks:
+    uses: ./.github/workflows/run-checks.yml
+    secrets:
+      SAM_APP_VALIDATE_ROLE_ARN: ${{ secrets.DEV_SAM_APP_VALIDATE_ROLE_ARN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
   deploy:
     uses: ./.github/workflows/deploy-frontend.yml
+    needs: run-checks
     secrets:
+      DYNATRACE_PAAS_TOKEN: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
       ARTIFACT_BUCKET_NAME: ${{ secrets.DEV_ARTIFACT_BUCKET_NAME }}
       CONTAINER_SIGN_KMS_KEY: ${{ secrets.DEV_CONTAINER_SIGN_KMS_KEY }}
       GH_ACTIONS_ROLE_ARN: ${{ secrets.DEV_GH_ACTIONS_ROLE_ARN }}
