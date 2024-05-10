@@ -230,6 +230,7 @@ Resources:
       ResourceId: !Sub 'service/${Environment}-orch-app-cluster/${Environment}-orch-frontend-ecs-service'
       ScalableDimension: ecs:service:DesiredCount
       ServiceNamespace: ecs
+    DependsOn: OrchFrontendECSService
 
   EcsServiceScaleInAlarm: 
     Type: AWS::CloudWatch::Alarm
