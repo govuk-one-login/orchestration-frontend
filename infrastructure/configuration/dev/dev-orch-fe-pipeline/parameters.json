@@ -26,5 +26,9 @@
   {
     "ParameterKey": "SigningProfileVersionArn",
     "ParameterValue": "arn:aws:signer:eu-west-2:761723964695:/signing-profiles/SigningProfile_Ag2f7jC8aokY/hsozMWacYH"
+  },
+  {
+    "ParameterKey": "ContainerSignerKmsKeyArn",
+    "ParameterValue": "arn:aws:kms:eu-west-2:761723964695:key/b9da23b8-c288-4128-b875-00b4708905bc"
   }
 ]
