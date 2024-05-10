@@ -22,6 +22,15 @@ of `dev`, `build`:
 ./provision_all.sh <environment>
 ```
 
+## Deploying Dev
+
+When deploying the dev resources there are some that need to be done manually. This is due to the dev environment being in
+the same account as other environments. Therefore the ECR needs to be deployed using the `provision_dev.sh` script as the stack needs to be uniquely named.
+
+```shell
+./provision_dev.sh
+```
+
 ## How to update
 
 To update the parameters used for our stacks, please update the parameters in

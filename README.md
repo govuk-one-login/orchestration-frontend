@@ -61,19 +61,9 @@ npm run build && npm run start
 
 ---
 
-## Deploying to Sandpit
+## Deploying to Dev
 
-It is assumed that the account provisioning stack has already been run and that the persistent resources are present:
-
-- ECR
-
-Ensure you are logged into an AWS account via SSO before deploying
-
-Sandpit can be deployed using:
-
-```shell script
-./deploy-sandpit.sh
-```
+Push your code to GitHub, and run the Deploy dev workflow. This should deploy your code to the dev environment.
 
 ## Formatting & Linting
 
