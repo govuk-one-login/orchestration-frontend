@@ -54,6 +54,9 @@
     "header": {
       "homepageHref": "https://www.gov.uk/"
     },
+    "languageToggle": {
+      "ariaLabel": "Choose Language"
+    },
     "footer": {
       "accessibilityStatement": {
         "pageTitle": "Accessibility statement",

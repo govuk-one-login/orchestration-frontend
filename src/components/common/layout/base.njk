@@ -3,6 +3,7 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "ga4-opl/macro.njk" import ga4OnPageLoad %}
+{% from "frontend-language-toggle/macro.njk" import languageSelect %}
 {% set assetPath="/orch-frontend/assets" %}
 {% block head %}
 
@@ -61,12 +62,32 @@
           html: phaseBannerText
         }) }}
 	      {% block beforeContent %}{% endblock %}
-	      {% if showBack %}
-	        {{ govukBackLink({
-                text: "general.back" | translate,
-                href: hrefBack
-            }) }}
-          {% endif %}
+        {% if showLanguageToggle %}
+          {{ languageSelect({
+            ariaLabel: 'general.base.languageToggle.ariaLabel' | translate,
+            url: currentUrl,
+            activeLanguage: htmlLang,
+            class: "govuk-!-margin-bottom-1",
+            languages: [
+            { 
+              code: 'en',
+              text: 'English',
+              visuallyHidden: 'Change to English'
+            },
+            {
+              code:'cy',
+              text: 'Cymraeg',
+              visuallyHidden: 'Newid yr iaith ir Gymraeg'
+            }]
+          })
+        }}
+        {% endif %}
+        {% if showBack %}
+          {{ govukBackLink({
+            text: "general.back" | translate,
+            href: hrefBack
+          }) }}
+        {% endif %} 
 	      <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
           <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds {{ rowClasses }}">

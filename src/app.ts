@@ -11,6 +11,7 @@ import { proveIdentityCallbackRouter } from "./components/prove-identity-callbac
 import { noCacheMiddleware } from "./middleware/no-cache-middleware";
 import { getSessionIdMiddleware } from "./middleware/session-middleware";
 import { setGTM } from "./middleware/analytics-middleware";
+import { languageToggleMiddleware } from "./middleware/language-toggle-middleware";
 import { serverErrorHandler } from "./handlers/internal-server-error-handler";
 import { errorPageGet } from "./components/errors/error-controller";
 import { PATH_NAMES } from "./app.constants";
@@ -21,6 +22,7 @@ import { loggerMiddleware } from "./utils/logger";
 const APP_VIEWS = [
   path.join(__dirname, "components"),
   path.resolve("node_modules/govuk-frontend/"),
+  path.resolve("node_modules/@govuk-one-login/"),
 ];
 
 async function createApp(): Promise<express.Application> {
@@ -57,6 +59,9 @@ async function createApp(): Promise<express.Application> {
 
   router.use(getSessionIdMiddleware);
   router.use(setGTM);
+
+  router.use(languageToggleMiddleware);
+
   router.use(proveIdentityCallbackRouter);
   router.get(PATH_NAMES.UNAVAILABLE_PERMANENT, permanentlyLockedController);
   router.get(PATH_NAMES.UNAVAILABLE_TEMPORARY, suspendedPageController);
