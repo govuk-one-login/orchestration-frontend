@@ -2,6 +2,7 @@ import express from "express";
 import i18next, { DefaultNamespace, TFunction } from "i18next";
 import * as nunjucks from "nunjucks";
 import { Environment } from "nunjucks";
+const addLanguageParam = require("@govuk-one-login/frontend-language-toggle/build/cjs/language-param-setter.cjs"); // import addLanguageParam (commonJS)
 
 export function configureNunjucks(
   app: express.Application,
@@ -19,6 +20,8 @@ export function configureNunjucks(
     );
     return translate(key, options);
   });
+
+  nunjucksEnv.addGlobal("addLanguageParam", addLanguageParam);
 
   return nunjucksEnv;
 }
