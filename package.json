@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@govuk-one-login/frontend-analytics": "1.0.3",
-    "axios": "^1.6.8",
+    "axios": "^1.7.1",
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
     "govuk-frontend": "^4.8.0",
