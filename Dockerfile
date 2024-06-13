@@ -1,4 +1,4 @@
-FROM node:22.2.0 as base
+FROM node:22.3.0 as base
 WORKDIR /app
 COPY package-lock.json ./
 COPY package.json ./
@@ -7,7 +7,7 @@ COPY ./src ./src
 RUN npm install 
 RUN npm run build
 
-FROM node:22.2.0 as release
+FROM node:22.3.0 as release
 WORKDIR /app
 COPY --chown=node:node --from=base /app/package*.json ./
 COPY --chown=node:node --from=base /app/node_modules/ node_modules
