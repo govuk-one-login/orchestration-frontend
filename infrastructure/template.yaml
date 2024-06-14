@@ -292,10 +292,7 @@ Resources:
       TargetType: ip
       HealthCheckProtocol: HTTP
       HealthCheckPort: "traffic-port"
-      HealthCheckPath: !If
-        - OidcApiGatewayIntegrationEnabled
-        - "/health"
-        - "/orch-frontend/health"
+      HealthCheckPath: "/orch-frontend/health"
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
