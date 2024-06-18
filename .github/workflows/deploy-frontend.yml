@@ -32,7 +32,7 @@ jobs:
           password: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
 
       - name: Push ECR and deploy
-        uses: govuk-one-login/devplatform-upload-action-ecr@v1.2.5
+        uses: govuk-one-login/devplatform-upload-action-ecr@v1.2.6
         with:
           docker-build-path: ./
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
