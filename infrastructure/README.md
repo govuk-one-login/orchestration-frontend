@@ -22,10 +22,10 @@ of `dev`, `build`:
 ./provision_all.sh <environment>
 ```
 
-## Deploying Dev
+## Provisioning Dev
 
-When deploying the dev resources there are some that need to be done manually. This is due to the dev environment being in
-the same account as other environments. Therefore the ECR needs to be deployed using the `provision_dev.sh` script as the stack needs to be uniquely named.
+When provisioning the dev resources there are some that need to be done manually. This is due to the dev environment being in
+the same account as other environments. As a temporary way to deploy provisioned resources the `provision_dev.sh` script should be run in addition to the `provision_all.sh` script. The `provision_dev.sh` script is needed to deploy a `dev` ECR as the stack needs to be uniquely named.
 
 ```shell
 ./provision_dev.sh
