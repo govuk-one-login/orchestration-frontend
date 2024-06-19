@@ -1,0 +1,6 @@
+[
+  {
+    "ParameterKey": "PipelineStackName",
+    "ParameterValue": "dev-orch-fe-pipeline"
+  }
+]

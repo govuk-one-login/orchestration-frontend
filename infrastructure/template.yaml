@@ -30,19 +30,16 @@ Conditions:
   IsProd:
     !Equals [ production, !Ref Environment ]
   OidcApiGatewayIntegrationEnabled:
-    !Equals [ sandpit, !Ref Environment ]
+    !Equals [ dev, !Ref Environment ]
 
 Mappings:
   EnvironmentConfiguration:
-    sandpit:
+    dev:
       vpcId: vpc-0b6f4a5d72f84ed0c
       subnetIds:
       - subnet-0027e271c35f828c1
       - subnet-0b648700a8ac43736
       - subnet-01b7b1c835828eb3d
-      dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
-    dev:
-      vpcId: vpc-024506f732c8d477f
       dynatraceSecretArn: arn:aws:secretsmanager:eu-west-2:216552277552:secret:DynatraceNonProductionVariables
     build:
       vpcId: vpc-03db44fa71b8d00b2
