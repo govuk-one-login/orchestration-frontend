@@ -1,37 +1,30 @@
-### Setup
+## Setup
 
 Clone the repo https://github.com/alphagov/di-devplatform-deploy in a directory next to this repo.
 
-### Required CLIs
+Install required CLIs:
 
-To run this tool you will need the below CLI's
-
-* aws cli for management of Cloudformation stacks
-* jq for formatting and conversion
+* `aws-cli` for management of CloudFormation stacks
+* `jq` for formatting and conversion
 
 ## How to use
 
-Login into AWS with SSO on the browser. Choose an account, and select `Command line or programmatic access`. In your
-terminal, run `aws configure sso` and enter the start URL and region from AWS on your browser. This will create a
-profile that you can set as an environment variable, by running `export AWS_PROFILE=<profile>`.
+Login into AWS with SSO on the browser. Choose an account, and select _Access Keys_. 
 
-After this you can then run the below, replacing `<environment>`with one
-of `dev`, `build`:
+Run `aws configure sso` and enter the start URL and region from AWS on your browser. 
 
-```shell
-./provision_all.sh <environment>
-```
+Set the resulting profile as an environment variable, by running `export AWS_PROFILE=<profile>`.
 
-## Provisioning Dev
+Run `./provision_all.sh <environment>`, replacing `<environment>` with `dev` or `build`.
 
-When provisioning the dev resources there are some that need to be done manually. This is due to the dev environment being in
-the same account as other environments. As a temporary way to deploy provisioned resources the `provision_dev.sh` script should be run in addition to the `provision_all.sh` script. The `provision_dev.sh` script is needed to deploy a `dev` ECR as the stack needs to be uniquely named.
 
-```shell
-./provision_dev.sh
-```
 
-## How to update
+## Provisioning dev ECR
 
-To update the parameters used for our stacks, please update the parameters in
-the `configuration/[ENVIRONMENT]/[PIPELINE]/parameters.json` files.
+The dev ECR resource needs to be provisioned separately, because the dev environment is in the same account as other environments, which causes naming conflicts.
+
+To provision the dev ECR, run `./provision_dev.sh` (after running `./provision_all.sh dev`). This is temporary workaround until dev exists in its own AWS account.
+
+## Updating stack parameters
+
+Stack parameters can be updated in /_configuration/\<environment>/\<pipeline>/parameters.json_.
