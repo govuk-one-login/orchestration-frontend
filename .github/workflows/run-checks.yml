@@ -17,7 +17,7 @@ jobs:
 
       - name: Get Node.js version
         run: |
-          version=$(grep -oP -m1 '(?<=node:).*(?= as)' Dockerfile)
+          version=$(grep -oP -m1 'node:\K.*(?=@)' Dockerfile)
           echo "NODE_VERSION=$version" >> $GITHUB_ENV
 
       - name: Using Node.js ${{ env.NODE_VERSION }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: Get Node.js version
         run: |
-          version=$(grep -oP -m1 '(?<=node:).*(?= as)' Dockerfile)
+          version=$(grep -oP -m1 'node:\K.*(?=@)' Dockerfile)
           echo "NODE_VERSION=$version" >> $GITHUB_ENV
 
       - name: Using Node.js ${{ env.NODE_VERSION }}
@@ -83,7 +83,7 @@ jobs:
 
       - name: Get Node.js version
         run: |
-          version=$(grep -oP -m1 '(?<=node:).*(?= as)' Dockerfile)
+          version=$(grep -oP -m1 'node:\K.*(?=@)' Dockerfile)
           echo "NODE_VERSION=$version" >> $GITHUB_ENV
 
       - name: Using Node.js ${{ env.NODE_VERSION }}
@@ -114,7 +114,7 @@ jobs:
 
       - name: Get Node.js version
         run: |
-          version=$(grep -oP -m1 '(?<=node:).*(?= as)' Dockerfile)
+          version=$(grep -oP -m1 'node:\K.*(?=@)' Dockerfile)
           echo "NODE_VERSION=$version" >> $GITHUB_ENV
 
       - name: Using Node.js ${{ env.NODE_VERSION }}
