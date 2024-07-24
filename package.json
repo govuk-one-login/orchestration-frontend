@@ -88,7 +88,7 @@
     "sinon-chai": "^3.7.0",
     "supertest": "^7.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3",
+    "typescript": "^5.5.4",
     "uglifyjs": "^2.4.11"
   }
 }
