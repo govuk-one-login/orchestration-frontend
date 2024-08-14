@@ -43,7 +43,7 @@
     "semi": true
   },
   "dependencies": {
-    "@govuk-one-login/frontend-analytics": "2.0.1",
+    "@govuk-one-login/frontend-analytics": "3.0.0",
     "axios": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "express": "^4.19.2",
