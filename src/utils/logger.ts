@@ -45,7 +45,7 @@ export function getRefererFrom(referer: string): string {
     try {
       const refererUrl = new URL(referer);
       return refererUrl.pathname;
-    } catch (error) {
+    } catch {
       return undefined;
     }
   } else {
