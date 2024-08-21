@@ -47,6 +47,7 @@ describe("prove identity callback controller", () => {
         res as Response
       );
 
+      /* eslint-disable-next-line @typescript-eslint/no-unused-expressions */
       expect(fakeProveIdentityService.getAuthCodeRedirectUri).to.have.been
         .called;
 
