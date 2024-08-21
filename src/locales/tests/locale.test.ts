@@ -1,7 +1,9 @@
 import { expect } from "chai";
 import { describe } from "mocha";
-import englishTranslations from "../en/translation.json";
-import welshTranslations from "../cy/translation.json";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const englishTranslations = require("../en/translation.json");
+const welshTranslations = require("../cy/translation.json");
 
 export function traverseObjectProperties(
   obj: any,
@@ -16,7 +18,7 @@ export function traverseObjectProperties(
   });
 }
 
-export function testExpectation(key: string, value: string): void {
+export function testExpectation(key: string, value: string | undefined): void {
   expect(value).to.not.contain(
     "'",
     "translated values should not contain typographically incorrect quotes (aka 'straight quotes')"

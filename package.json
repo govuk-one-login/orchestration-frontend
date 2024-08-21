@@ -4,6 +4,7 @@
   "description": "",
   "author": "",
   "license": "ISC",
+  "type": "module",
   "scripts": {
     "build": "npm run build-sass && npx tsc && npm run copy-assets",
     "build-sass": "rm -rf dist/public/style.css dist/govuk-frontend/all-ie8.css && sass --load-path=node_modules/govuk-frontend/govuk --no-source-map --quiet-deps src/assets/scss/application.scss:dist/public/style.css src/assets/scss/ie8.scss:dist/govuk-frontend/all-ie8.css --style compressed",
@@ -35,7 +36,11 @@
     "require": [
       "ts-node/register"
     ],
-    "exit": true
+    "exit": true,
+    "node-option": [
+      "experimental-specifier-resolution=node",
+      "loader=ts-node/esm"
+    ]
   },
   "prettier": {
     "trailingComma": "es5",

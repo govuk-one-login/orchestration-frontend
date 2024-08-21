@@ -19,7 +19,7 @@ import { suspendedPageController } from "./components/suspended-page/suspended-p
 import { loggerMiddleware } from "./utils/logger";
 
 const APP_VIEWS = [
-  path.join(__dirname, "components"),
+  path.join(path.resolve(), "components"),
   path.resolve("node_modules/govuk-frontend/"),
 ];
 
