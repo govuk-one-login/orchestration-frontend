@@ -1,10 +1,10 @@
-FROM node:22.6.0@sha256:914458d8617650599ec2c05f6754403a1ce08cb471b0b1de1de439c539f8d45f as base
+FROM node:22.7.0@sha256:329e65250d507539bfdd909582937c8418ae4614c09677ce971d845951b25b1f as base
 WORKDIR /app
 COPY . ./
 RUN npm install 
 RUN npm run build
 
-FROM node:22.6.0@sha256:914458d8617650599ec2c05f6754403a1ce08cb471b0b1de1de439c539f8d45f as release
+FROM node:22.7.0@sha256:329e65250d507539bfdd909582937c8418ae4614c09677ce971d845951b25b1f as release
 WORKDIR /app
 COPY --chown=node:node --from=base /app/package*.json ./
 COPY --chown=node:node --from=base /app/node_modules/ node_modules
