@@ -25,14 +25,14 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Login to GDS Dev Dynatrace Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
           registry: khw46367.live.dynatrace.com
           username: khw46367
           password: ${{ secrets.DYNATRACE_PAAS_TOKEN }}
 
       - name: Push ECR and deploy
-        uses: govuk-one-login/devplatform-upload-action-ecr@v1.3.0
+        uses: govuk-one-login/devplatform-upload-action-ecr@5431bcea6158b6c12776a96e067b1e02bf91b13d # v1.3.0
         with:
           docker-build-path: ./
           artifact-bucket-name: ${{ secrets.ARTIFACT_BUCKET_NAME }}
