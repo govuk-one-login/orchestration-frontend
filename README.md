@@ -1,5 +1,8 @@
 # orchestration-frontend
 
+This repository has now been archived. Due to UCD guidance, the spinner is being removed from identity journeys, and 
+therefore there is no longer a requirement for a frontend in the Orchestration component.
+
 ## Requirements
 
 You will need the AWS CLI. You can install it via:
